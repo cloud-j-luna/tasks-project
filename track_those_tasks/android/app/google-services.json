@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "969210256952",
+    "firebase_url": "https://tasks-project-ca5f2.firebaseio.com",
+    "project_id": "tasks-project-ca5f2",
+    "storage_bucket": "tasks-project-ca5f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969210256952:android:a06c862c2855d6566b50cd",
+        "android_client_info": {
+          "package_name": "com.ttt.track_those_tasks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "969210256952-voplu38gu141hj0immhe9dvtc7eo96s7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAF43zrgfuay6XY9XmHXa3t--xIqiD9C3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "969210256952-voplu38gu141hj0immhe9dvtc7eo96s7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
