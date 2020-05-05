@@ -6,11 +6,11 @@ class User {
 
     get name() { return this.name }
 
-    get name(val) { this.name = val }
+    set name(val) { this.name = val }
 
     get email() { return this.email }
 
-    get email(val) { this.email = val }
+    set email(val) { this.email = val }
 }
 
 module.exports = {
