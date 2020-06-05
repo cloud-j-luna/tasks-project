@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/assets/colors.dart';
 import 'package:trackthosetasks/screens/navigation/menus.dart';
-import 'package:trackthosetasks/screens/views/dashboard.dart';
+import 'package:trackthosetasks/screens/views/dashboard_screen.dart';
 import 'package:trackthosetasks/screens/views/profile.dart';
 import 'package:trackthosetasks/screens/views/settings.dart';
 import 'package:trackthosetasks/screens/views/task_list.dart';
@@ -21,8 +21,8 @@ class _WrapperViewState extends State<WrapperView> {
   @override
   void initState() {
     pages.add(ProfileView());
-    pages.add(DashboardView());
-    pages.add(TaskListView());
+    pages.add(DashboardScreen());
+    pages.add(TaskListScreen());
     pages.add(SettingsView());
     super.initState();
   }
