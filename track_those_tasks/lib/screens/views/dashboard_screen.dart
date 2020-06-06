@@ -5,12 +5,51 @@ import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task_list.dart';
 import 'package:trackthosetasks/screens/views/task_list.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key key}) : super(key: key);
+class DashboardScreen extends StatefulWidget {
+  @override
+  _DashboardScreen createState() => _DashboardScreen();
+}
+
+class _DashboardScreen extends State<DashboardScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // These are the callbacks
+    switch (state) {
+      case AppLifecycleState.resumed:
+        bloc.getFromFile();
+        break;
+      case AppLifecycleState.inactive:
+        // widget is inactive
+        break;
+      case AppLifecycleState.paused:
+        // widget is paused
+        break;
+      case AppLifecycleState.detached:
+        // widget is detached
+        break;
+    }
+  }
+
+  final DashboardBloc bloc = DashboardBloc();
 
   @override
   Widget build(BuildContext context) {
-    final bloc = DashboardBloc();
     return Scaffold(
       appBar: AppBar(
         title: Text("YOUR LISTS"),
@@ -81,7 +120,10 @@ class DashboardScreen extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => TaskListScreen(taskList: taskList)));
+                builder: (context) => TaskListScreen(
+                      taskList,
+                      bloc,
+                    )));
       },
       title: Text(taskList.name),
       trailing: Icon(Icons.keyboard_arrow_right),

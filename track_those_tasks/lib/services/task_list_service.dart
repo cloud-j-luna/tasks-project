@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:trackthosetasks/models/task.dart';
@@ -23,5 +24,14 @@ class TaskListService {
       taskLists.add(taskList);
     }
     return taskLists;
+  }
+
+  Future<bool> saveTaskLists(List<TaskList> lists) async {
+    final file = await rootBundle.loadString("assets/mock_data.json");
+
+    var json = jsonEncode(lists);
+    File(file)
+      ..createSync(recursive: true)
+      ..writeAsString(json);
   }
 }

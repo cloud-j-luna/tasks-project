@@ -7,6 +7,7 @@ import 'BLoC/bloc_provider.dart';
 import 'BLoC/task_list_bloc.dart';
 import 'models/user.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -27,6 +28,7 @@ Widget _widget() {
         primarySwatch: Colors.red,
       ),
       home: MainScreen(),
+      navigatorObservers: [routeObserver],
     ),
   );
 }

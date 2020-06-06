@@ -22,7 +22,6 @@ class _WrapperViewState extends State<WrapperView> {
   void initState() {
     pages.add(ProfileView());
     pages.add(DashboardScreen());
-    pages.add(TaskListScreen());
     pages.add(SettingsView());
     super.initState();
   }
