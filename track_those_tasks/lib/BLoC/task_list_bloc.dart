@@ -4,18 +4,21 @@ import 'package:trackthosetasks/models/task_list.dart';
 
 import 'bloc.dart';
 
-class TaskListBloc implements Bloc {
+class SelectedTaskListBloc implements Bloc {
   TaskList _taskList;
   TaskList get selectedTaskList => _taskList;
 
-  final _taskListController = StreamController<TaskList>();
+  final _taskListController = StreamController<TaskList>.broadcast();
+
+  SelectedTaskListBloc() {
+    taskListStream.listen((taskList) {
+      _taskList = taskList;
+    });
+  }
 
   Stream<TaskList> get taskListStream => _taskListController.stream;
 
-  void selectTaskList(TaskList taskList) {
-    _taskList = taskList;
-    _taskListController.sink.add(taskList);
-  }
+  Sink<TaskList> get updateTaskList => _taskListController.sink;
 
   @override
   void dispose() {

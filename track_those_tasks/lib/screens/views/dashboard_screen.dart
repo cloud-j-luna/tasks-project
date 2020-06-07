@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:trackthosetasks/BLoC/app_bloc.dart';
 import 'package:trackthosetasks/BLoC/bloc_provider.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
+import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task_list.dart';
-import 'package:trackthosetasks/screens/views/task_list.dart';
+import 'package:trackthosetasks/screens/views/task_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -32,7 +34,7 @@ class _DashboardScreen extends State<DashboardScreen>
     // These are the callbacks
     switch (state) {
       case AppLifecycleState.resumed:
-        bloc.getFromFile();
+        _dashBoardBloc.getFromFile();
         break;
       case AppLifecycleState.inactive:
         // widget is inactive
@@ -46,15 +48,20 @@ class _DashboardScreen extends State<DashboardScreen>
     }
   }
 
-  final DashboardBloc bloc = DashboardBloc();
-
+  DashboardBloc _dashBoardBloc;
+  SelectedTaskListBloc _selectedTaskListBloc;
   @override
   Widget build(BuildContext context) {
+    final _appBloc = AppBloc();
+
+    _dashBoardBloc = _appBloc.dashboardBloc;
+    _selectedTaskListBloc = _appBloc.taskListBloc;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("YOUR LISTS"),
       ),
-      body: _buildSearch(context, bloc),
+      body: _buildSearch(context, _dashBoardBloc),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -63,7 +70,7 @@ class _DashboardScreen extends State<DashboardScreen>
                 return _buildAddTaskListForm(context, dialogContext);
               }).then((value) {
             print(value);
-            bloc.addTaskList(value);
+            _dashBoardBloc.addTaskList(value);
           });
         },
         child: Icon(Icons.add),
@@ -85,7 +92,7 @@ class _DashboardScreen extends State<DashboardScreen>
 
   Widget _buildStreamBuilder(DashboardBloc bloc) {
     return StreamBuilder(
-      stream: bloc.taskListStream,
+      stream: bloc.listsStream,
       builder: (context, snapshot) {
         final results = snapshot.data;
 
@@ -117,12 +124,13 @@ class _DashboardScreen extends State<DashboardScreen>
   Widget _tempTile(BuildContext context, TaskList taskList) {
     return ListTile(
       onTap: () {
+        _selectedTaskListBloc.updateTaskList.add(taskList);
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => TaskListScreen(
-                      taskList,
-                      bloc,
+                      _selectedTaskListBloc,
+                      _dashBoardBloc,
                     )));
       },
       title: Text(taskList.name),

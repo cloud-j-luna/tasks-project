@@ -4,3 +4,6 @@ const String TASK_LIST_EMPTY = "Empty List";
 const String TASK_LIST_SAVE = "Save";
 const String TASK_LIST_ERROR_WHILE_SAVING = "There was a problem saving this list.";
 const String TASK_LIST_ERROR_WHILE_DELETING = "There was a problem deleting this list.";
+const String TASK_LIST_ADD_TASK_TITLE = "Task title";
+const String TASK_LIST_ADD_TASK_DESCRIPTION = "Task description";
+const String TASK_LIST_ADD_TASK_SUBMIT = "Add Task";
