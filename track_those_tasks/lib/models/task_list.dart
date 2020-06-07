@@ -16,6 +16,6 @@ class TaskList {
 
   @override
   String toString() {
-    return "[$uuid] : $name - ${tasks.length} tasks ";
+    return "[${uuid.toString()}] : $name - ${tasks.length} tasks ";
   }
 }

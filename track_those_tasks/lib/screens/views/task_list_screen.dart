@@ -126,8 +126,9 @@ class _TaskListScreen extends State<TaskListScreen> {
             itemCount: taskList.tasks?.length,
             itemBuilder: (context, index) {
               Task task = taskList.tasks[index];
+              return _buildTaskCard(task);
 
-              return Container(
+              /*return Container(
                   height: 200,
                   margin: EdgeInsets.all(10),
                   padding: EdgeInsets.all(10),
@@ -159,8 +160,26 @@ class _TaskListScreen extends State<TaskListScreen> {
                         )
                       ],
                     ),
-                  ));
+                  ));*/
             }));
+  }
+
+  Widget _buildTaskCard(Task task) {
+    return Card(
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
+          trailing: Icon(Icons.more_vert),
+          title: Text(task.title),
+          subtitle: Text(task.description),
+          isThreeLine: true,
+          dense: true,
+        ),
+        Text("00:00"),
+        ButtonBar(children: _buildTaskActionButtons(task))
+      ],
+    ));
   }
 
   Widget _buildAddTaskListForm(
@@ -221,5 +240,35 @@ class _TaskListScreen extends State<TaskListScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildTaskActionButtons(Task task) {
+    List<Widget> actions = List<Widget>();
+
+    if (task.status == TaskStatus.inProgress)
+      actions.add(FlatButton(
+        child: Text(TASK_ACTION_RESUME),
+        onPressed: () => task.startTask(),
+      ));
+
+    if (task.status == TaskStatus.none)
+      actions.add(FlatButton(
+        child: Text(TASK_ACTION_START),
+        onPressed: () => task.startTask(),
+      ));
+
+    if (task.status == TaskStatus.doing) {
+      actions.add(FlatButton(
+        child: Text(TASK_ACTION_PAUSE),
+        onPressed: () => task.pauseTask(),
+      ));
+
+      actions.add(FlatButton(
+        child: Text(TASK_ACTION_DONE),
+        onPressed: () => task.finishTask(),
+      ));
+    }
+
+    return actions;
   }
 }
