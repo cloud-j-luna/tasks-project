@@ -4,9 +4,11 @@ class TaskList {
   final String uuid;
   String name;
   List<Task> tasks;
+  TaskListSettings settings;
 
   TaskList({this.uuid, this.name}) {
     this.tasks = List<Task>();
+    this.settings = TaskListSettings();
   }
 
   void addTask(Task task) {
@@ -17,5 +19,13 @@ class TaskList {
   @override
   String toString() {
     return "[${uuid.toString()}] : $name - ${tasks.length} tasks ";
+  }
+}
+
+class TaskListSettings {
+  bool allowsSimultaneousTasks;
+
+  TaskListSettings() {
+    this.allowsSimultaneousTasks = false;
   }
 }

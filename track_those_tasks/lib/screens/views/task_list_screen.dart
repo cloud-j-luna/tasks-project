@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -6,29 +7,84 @@ import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task.dart';
 import 'package:trackthosetasks/models/task_list.dart';
-import 'package:trackthosetasks/assets/styles.dart';
 import 'package:trackthosetasks/screens/views/task_list_settings_screen.dart';
 import 'package:uuid/uuid.dart';
+import 'package:proximity_plugin/proximity_plugin.dart';
+
+import 'package:trackthosetasks/extensions.dart';
 
 class TaskListScreen extends StatefulWidget {
-  final SelectedTaskListBloc selectedTaskListBloc;
+  final selectedTaskList;
   final DashboardBloc dashboardBloc;
 
-  TaskListScreen(this.selectedTaskListBloc, this.dashboardBloc);
+  TaskListScreen(this.selectedTaskList, this.dashboardBloc);
 
   @override
-  State<StatefulWidget> createState() => _TaskListScreen();
+  State<StatefulWidget> createState() => _TaskListScreen(selectedTaskList);
 }
 
 class _TaskListScreen extends State<TaskListScreen> {
+  Timer _timer;
+  SelectedTaskListBloc _selectedTaskListBloc;
+
+  StreamSubscription proxSubscription;
+  bool _proximityIn;
+  bool _paused;
+
+  _TaskListScreen(TaskList selectedTaskList) {
+    _selectedTaskListBloc = SelectedTaskListBloc();
+    _selectedTaskListBloc.selectTaskList(selectedTaskList);
+    _proximityIn = false;
+    _paused = false;
+
+    proxSubscription = proximityEvents.listen((event) {
+      if (_proximityIn) {
+        log("Prox IN");
+      } else {
+        if (_paused)
+          _selectedTaskListBloc.resumeCurrentTasks();
+        else
+          _selectedTaskListBloc.pauseCurrentTasks();
+
+          _paused = !_paused;
+        log("Prox OUT");
+      }
+      _proximityIn = !_proximityIn;
+    });
+  }
+
+  _startTimeCounter() {
+    print("started");
+    setState(() {}); // force UI update
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) => setState(
+        () {},
+      ),
+    );
+  }
+
+  _stopTimeCounter() {
+    print("stoped");
+    _timer?.cancel();
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    proxSubscription.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final _dashboardBloc = widget.dashboardBloc;
-    final _selectedTaskListBloc = widget.selectedTaskListBloc;
     TaskList _taskList = _selectedTaskListBloc.selectedTaskList;
 
     _updateCurrentTaskList(TaskList updatedTaskList) {
-      _selectedTaskListBloc.updateTaskList.add(updatedTaskList);
+      _selectedTaskListBloc.updateTaskList(updatedTaskList);
     }
 
     _deleteCurrentTaskList(BuildContext context) {
@@ -51,7 +107,9 @@ class _TaskListScreen extends State<TaskListScreen> {
     return StreamBuilder(
         stream: _selectedTaskListBloc.taskListStream,
         builder: (context, snapshot) {
-          if (snapshot.data == null) log("error");
+          if (snapshot.data == null) {
+            return Text("Loading");
+          }
 
           return Scaffold(
             appBar: AppBar(
@@ -95,7 +153,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                       description: description);
 
                   _taskList.addTask(task);
-                  _selectedTaskListBloc.updateTaskList.add(_taskList);
+                  _selectedTaskListBloc.updateTaskList(_taskList);
                 });
               },
               child: Icon(Icons.add),
@@ -112,7 +170,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                           padding: EdgeInsets.all(10),
                           child: Text(_taskList.name),
                         ),
-                        _buildListOfTasks(_taskList),
+                        _buildListOfTasks(_taskList, _selectedTaskListBloc),
                       ],
                     ),
                   ),
@@ -120,13 +178,13 @@ class _TaskListScreen extends State<TaskListScreen> {
         });
   }
 
-  Widget _buildListOfTasks(TaskList taskList) {
+  Widget _buildListOfTasks(TaskList taskList, SelectedTaskListBloc bloc) {
     return Expanded(
         child: ListView.builder(
             itemCount: taskList.tasks?.length,
             itemBuilder: (context, index) {
               Task task = taskList.tasks[index];
-              return _buildTaskCard(task);
+              return _buildTaskCard(task, bloc);
 
               /*return Container(
                   height: 200,
@@ -164,7 +222,7 @@ class _TaskListScreen extends State<TaskListScreen> {
             }));
   }
 
-  Widget _buildTaskCard(Task task) {
+  Widget _buildTaskCard(Task task, SelectedTaskListBloc bloc) {
     return Card(
         child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -174,10 +232,18 @@ class _TaskListScreen extends State<TaskListScreen> {
           title: Text(task.title),
           subtitle: Text(task.description),
           isThreeLine: true,
-          dense: true,
         ),
-        Text("00:00"),
-        ButtonBar(children: _buildTaskActionButtons(task))
+        Padding(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: <Widget>[
+              Text(task.currentSession.format()),
+              VerticalDivider(),
+              Text(task.totalDuration.format())
+            ],
+          ),
+        ),
+        ButtonBar(children: _buildTaskActionButtons(task, bloc))
       ],
     ));
   }
@@ -242,30 +308,44 @@ class _TaskListScreen extends State<TaskListScreen> {
     );
   }
 
-  List<Widget> _buildTaskActionButtons(Task task) {
+  List<Widget> _buildTaskActionButtons(Task task, SelectedTaskListBloc bloc) {
     List<Widget> actions = List<Widget>();
+
+    void _startTask() {
+      bloc.checkSimultaneousTasks();
+      task.startTask();
+      _selectedTaskListBloc.addCurrentTask(task);
+      _startTimeCounter();
+    }
 
     if (task.status == TaskStatus.inProgress)
       actions.add(FlatButton(
         child: Text(TASK_ACTION_RESUME),
-        onPressed: () => task.startTask(),
+        onPressed: () => _startTask(),
       ));
 
     if (task.status == TaskStatus.none)
       actions.add(FlatButton(
         child: Text(TASK_ACTION_START),
-        onPressed: () => task.startTask(),
+        onPressed: () => _startTask(),
       ));
 
     if (task.status == TaskStatus.doing) {
       actions.add(FlatButton(
         child: Text(TASK_ACTION_PAUSE),
-        onPressed: () => task.pauseTask(),
+        onPressed: () {
+          task.pauseTask();
+          _stopTimeCounter();
+        },
       ));
 
       actions.add(FlatButton(
         child: Text(TASK_ACTION_DONE),
-        onPressed: () => task.finishTask(),
+        onPressed: () {
+          task.finishTask();
+          _selectedTaskListBloc.removeCurrentTask(task);
+          _stopTimeCounter();
+        },
       ));
     }
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/BLoC/app_bloc.dart';
 import 'package:trackthosetasks/BLoC/bloc_provider.dart';
@@ -49,13 +51,11 @@ class _DashboardScreen extends State<DashboardScreen>
   }
 
   DashboardBloc _dashBoardBloc;
-  SelectedTaskListBloc _selectedTaskListBloc;
   @override
   Widget build(BuildContext context) {
-    final _appBloc = AppBloc();
+    // final _appBloc = AppBloc();
 
-    _dashBoardBloc = _appBloc.dashboardBloc;
-    _selectedTaskListBloc = _appBloc.taskListBloc;
+    _dashBoardBloc = DashboardBloc();
 
     return Scaffold(
       appBar: AppBar(
@@ -124,12 +124,12 @@ class _DashboardScreen extends State<DashboardScreen>
   Widget _tempTile(BuildContext context, TaskList taskList) {
     return ListTile(
       onTap: () {
-        _selectedTaskListBloc.updateTaskList.add(taskList);
+        log("Opening list:  ${taskList.name}");
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => TaskListScreen(
-                      _selectedTaskListBloc,
+                      taskList,
                       _dashBoardBloc,
                     )));
       },

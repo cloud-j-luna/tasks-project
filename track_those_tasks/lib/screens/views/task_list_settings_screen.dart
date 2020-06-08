@@ -1,20 +1,32 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task_list.dart';
 
-class TaskListSettingsScreen extends StatelessWidget {
+class TaskListSettingsScreen extends StatefulWidget {
+  final TaskList taskList;
+  final DashboardBloc dashboardBloc;
+
+  TaskListSettingsScreen(this.taskList, this.dashboardBloc);
+
+  @override
+  State<StatefulWidget> createState() =>
+      _TaskListSettingsScreen(this.taskList, this.dashboardBloc);
+}
+
+class _TaskListSettingsScreen extends State<TaskListSettingsScreen> {
   final TaskList taskList;
   final DashboardBloc dashboardBloc;
   final TextEditingController _nameController = TextEditingController();
-  TaskListSettingsScreen(this.taskList, this.dashboardBloc, {Key key})
-      : super(key: key);
+  _TaskListSettingsScreen(this.taskList, this.dashboardBloc);
 
   @override
   Widget build(BuildContext context) {
     _nameController.text = taskList.name;
-
+    log((taskList?.settings == null).toString());
     return Scaffold(
       appBar: AppBar(
         title: Text(taskList.name),
@@ -35,6 +47,18 @@ class TaskListSettingsScreen extends StatelessWidget {
               child: TextFormField(
                 controller: _nameController,
               ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: CheckboxListTile(
+                  title: Text(TASK_LIST_SETTINGS_ALLOW_SIMULTANIOUS_TASKS),
+                  value: taskList?.settings?.allowsSimultaneousTasks,
+                  onChanged: (bool value) {
+                    print("updated");
+                    setState(() {
+                      taskList?.settings?.allowsSimultaneousTasks = value;
+                    });
+                  }),
             ),
           ],
         ),

@@ -7,6 +7,7 @@ const String TASK_LIST_ERROR_WHILE_DELETING = "There was a problem deleting this
 const String TASK_LIST_ADD_TASK_TITLE = "Task title";
 const String TASK_LIST_ADD_TASK_DESCRIPTION = "Task description";
 const String TASK_LIST_ADD_TASK_SUBMIT = "Add Task";
+const String TASK_LIST_SETTINGS_ALLOW_SIMULTANIOUS_TASKS = "Allow simultaneous tasks";
 
 const String TASK_ACTION_START = "Start";
 const String TASK_ACTION_DONE = "Complete";

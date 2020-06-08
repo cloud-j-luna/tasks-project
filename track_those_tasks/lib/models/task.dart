@@ -18,6 +18,25 @@ class Task {
         description: parsedJson['description'] as String);
   }
 
+  Duration get currentSession {
+    if (startTimestamp == null) return null;
+
+    final end = DateTime.now();
+
+    return end.difference(startTimestamp);
+  }
+
+  Duration get totalDuration {
+    Duration total = Duration();
+
+    intervals.forEach((i) {
+      total += i;
+    });
+
+    Duration currentSession = this.currentSession;
+    return currentSession == null ? total : total + currentSession;
+  }
+
   void startTask() {
     this.status = TaskStatus.doing;
     startTimestamp = DateTime.now();

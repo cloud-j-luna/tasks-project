@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/assets/colors.dart';
 import 'package:trackthosetasks/screens/navigation/menus.dart';
-import 'package:trackthosetasks/services/auth.dart';
 
 class WrapperView extends StatefulWidget {
   @override
@@ -9,7 +8,7 @@ class WrapperView extends StatefulWidget {
 }
 
 class _WrapperViewState extends State<WrapperView> {
-  final AuthService _authService = AuthService();
+  // final AuthService _authService = AuthService();
 
   List<Widget> pages = List<Widget>();
   int _currentIndex = 1;

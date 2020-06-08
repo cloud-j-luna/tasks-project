@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -26,7 +25,7 @@ class TaskListService {
     return taskLists;
   }
 
-  Future<bool> saveTaskLists(List<TaskList> lists) async {
+  void saveTaskLists(List<TaskList> lists) async {
     final file = await rootBundle.loadString("assets/mock_data.json");
 
     var json = jsonEncode(lists);

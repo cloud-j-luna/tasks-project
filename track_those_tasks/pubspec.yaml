@@ -14,7 +14,7 @@ description: Task tracking application
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -27,6 +27,7 @@ dependencies:
   cloud_firestore: ^0.12.9+4
   provider: ^4.0.5+1
   uuid: 2.0.4
+  proximity_plugin: ^1.0.2
 
 
 
