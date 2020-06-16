@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
 import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task.dart';
 import 'package:trackthosetasks/models/task_list.dart';
+import 'package:trackthosetasks/screens/views/take_picture_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_settings_screen.dart';
 import 'package:uuid/uuid.dart';
 import 'package:proximity_plugin/proximity_plugin.dart';
@@ -46,7 +48,7 @@ class _TaskListScreen extends State<TaskListScreen> {
         else
           _selectedTaskListBloc.pauseCurrentTasks();
 
-          _paused = !_paused;
+        _paused = !_paused;
         log("Prox OUT");
       }
       _proximityIn = !_proximityIn;
@@ -185,40 +187,6 @@ class _TaskListScreen extends State<TaskListScreen> {
             itemBuilder: (context, index) {
               Task task = taskList.tasks[index];
               return _buildTaskCard(task, bloc);
-
-              /*return Container(
-                  height: 200,
-                  margin: EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(8.0),
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10.0,
-                            offset: Offset(0.0, 10.0))
-                      ]),
-                  width: double.maxFinite,
-                  child: Container(
-                    margin: EdgeInsets.all(16),
-                    constraints: BoxConstraints.expand(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          task.title,
-                          style: ScreenStyles().headerTextStyle,
-                        ),
-                        Container(height: 10.0),
-                        Text(
-                          task.description,
-                          style: ScreenStyles().subHeaderTextStyle,
-                        )
-                      ],
-                    ),
-                  ));*/
             }));
   }
 
@@ -239,7 +207,9 @@ class _TaskListScreen extends State<TaskListScreen> {
             children: <Widget>[
               Text(task.currentSession.format()),
               VerticalDivider(),
-              Text(task.totalDuration.format())
+              Text(task.totalDuration.format()),
+              VerticalDivider(),
+              Text("${task.attachmentPaths.length} attachments"),
             ],
           ),
         ),
@@ -348,6 +318,24 @@ class _TaskListScreen extends State<TaskListScreen> {
         },
       ));
     }
+
+    actions.add(FlatButton(
+      child: Text(TASK_ACTION_ADD_ATTACHMENT),
+      onPressed: () async {
+        final cameras = await availableCameras();
+
+        final firstCamera = cameras.first;
+
+        Navigator.push(context,
+            new MaterialPageRoute(builder: (BuildContext context) {
+          return TakePictureScreen(camera: firstCamera);
+        })).then((value) => task.addAttachmentPath(value));
+      },
+    ));
+    actions.add(FlatButton(
+      child: Text(TASK_ACTION_SHOW_ATTACHMENT),
+      onPressed: () {},
+    ));
 
     return actions;
   }

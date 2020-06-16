@@ -4,11 +4,13 @@ class Task {
   String description;
   TaskStatus status;
   List<Duration> intervals;
+  List<String> attachmentPaths;
   DateTime startTimestamp;
 
   Task({this.uuid, this.title, this.description}) {
     this.status = TaskStatus.none;
     this.intervals = List<Duration>();
+    this.attachmentPaths = List<String>();
   }
 
   factory Task.fromJson(Map<String, dynamic> parsedJson) {
@@ -35,6 +37,10 @@ class Task {
 
     Duration currentSession = this.currentSession;
     return currentSession == null ? total : total + currentSession;
+  }
+
+  void addAttachmentPath(String path) {
+    this.attachmentPaths.add(path);
   }
 
   void startTask() {
