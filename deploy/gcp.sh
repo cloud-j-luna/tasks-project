@@ -25,7 +25,7 @@ gcloud container clusters \
 		--project $PROJECT_ID
 gcloud auth configure-docker
 
-docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION .
+docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION ./backend
 docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION
 
 kubectl apply -f deploy/deployment.yaml
