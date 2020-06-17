@@ -18,15 +18,15 @@ echo $GKE_SERVICE_KEY | base64 -d > service-account.json
 gcloud components update kubectl
 gcloud auth activate-service-account --key-file service-account.json
 
-gcloud config set project $(PROJECT_ID)
+gcloud config set project $PROJECT_ID
 gcloud container clusters \
-		get-credentials $(K8s_CLUSTER) \
-		--zone $(ZONE) \
-		--project $(PROJECT_ID)
+		get-credentials $K8s_CLUSTER \
+		--zone $ZONE \
+		--project $PROJECT_ID
 gcloud auth configure-docker
 
-docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$(PROJECT_ID)/$(IMAGE_NAME):$(IMAGE_VERSION) .
-docker push gcr.io/$(PROJECT_ID)/$(IMAGE_NAME):$(IMAGE_VERSION)
+docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION .
+docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION
 
 kubectl apply -f deploy/deployment.yaml
-kubectl patch deployment $(IMAGE_NAME) -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+kubectl patch deployment $IMAGE_NAME -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
