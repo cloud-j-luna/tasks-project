@@ -28,5 +28,5 @@ gcloud auth configure-docker
 docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION ./backend
 docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION
 
-kubectl apply -f deploy/deployment.yaml
+kubectl apply -f deploy/tasks.yaml
 kubectl patch deployment $IMAGE_NAME -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
