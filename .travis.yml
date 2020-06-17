@@ -1,6 +1,7 @@
 branches:
   only:
   - master
+  - cd
 
 cache:
   directories:
@@ -18,4 +19,5 @@ env:
 script: echo "This should be running tests for continuous integration"
 
 after_success:
+- chmod +x ./deploy/gcp.sh
 - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then ./deploy/gcp.sh; fi
