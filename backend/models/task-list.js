@@ -1,6 +1,5 @@
 class TaskList {
-    constructor(id, name, description, tasks, isFavourite) {
-        this._id = id;
+    constructor(name, description, tasks, isFavourite) {
         this._name = name;
         this._description = description;
         this._tasks = tasks;

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: ttt-tasks
+  name: ttt-tasks-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ttt-tasks
+  template:
+    metadata:
+      labels:
+        name: ttt-tasks
+    spec:
+      containers:
+      - name: ttt-tasks-app
+        image: gcr.io/track-those-tasks/ttt-tasks:v1
+        imagePullPolicy: Always
+        env:
+        - name: SERVER_ID  #export the pod ID as SERVER_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: environment
+          value: dev
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ttt-tasks-service
+  namespace: ttt-tasks-dev
+spec:
+  type: NodePort
+  selector:
+    name: ttt-tasks
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

@@ -1,4 +1,7 @@
+/** POC FILE, NOT REAL CODE. */
+
 var admin = require("firebase-admin");
+const { v4: uuidv4 } = require('uuid');
 
 var serviceAccount = {
     "type": "service_account",
@@ -18,12 +21,33 @@ admin.initializeApp({
     databaseURL: "https://tasks-project-ca5f2.firebaseio.com"
 });
 
-exports.CreateTaskList = function () {
-    let docRef = db.collection('users').doc('alovelace');
+let db = admin.firestore();
 
-    let setAda = docRef.set({
-        first: 'Ada',
-        last: 'Lovelace',
-        born: 1815
+exports.Create = function (tasklist) {
+    let docRef = db.collection('tasklist').doc(uuidv4());
+
+    let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).
+}
+
+exports.Read = function (callback, tasklistId) {
+
+    if(!tasklistId) db.collection('tasklist').get().then(snapshot => {
+        const col = [];
+        snapshot.forEach((doc) => {
+            col.push(doc.data());
+        });
+        callback(col);
     });
+}
+
+exports.Update = function (tasklist) {
+    let docRef = db.collection('tasklist').doc(uuidv4());
+
+    let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).
+}
+
+exports.Delete = function (tasklist) {
+    let docRef = db.collection('tasklist').doc(uuidv4());
+
+    let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).
 }

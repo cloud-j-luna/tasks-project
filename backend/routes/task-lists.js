@@ -1,39 +1,46 @@
 const TaskList = require('../models/task-list').TaskList;
+const TaskListRepository = require('../repository/task-list');
 var express = require('express');
+const { Task } = require('../models/task');
 var router = express.Router();
 
-mockLists = [
-    new TaskList(
-        "id-01",
-        "Frontend UI/UX",
-        "Frontend tasks for UI/UX",
-        ["task1", "task2", "task3"],
-        true
-    ),
-    new TaskList(
-        "id-02",
-        "Backend Refactor",
-        "Backend refactoring effort task list",
-        ["task1", "task2"],
-        true
-    ),
-    new TaskList(
-        "id-03",
-        "Bugs Release 1",
-        "Bug list for Release 1",
-        ["task1", "task2", "task3", "task4", "task5"],
-        false
-    ),
-];
-
 router.get('/', function (req, res, next) {
-    taskLists = mockLists;
-    res.json(taskLists);
+    TaskListRepository.Read(data => {
+        res.json(data);
+    });
+    
 });
 
 router.post('/', function (req, res, next) {
-    mockLists.append(req.body.taskList);
-    res.sendStatus(201);
+    console.log(req.body);
+    TaskListRepository.Create(new TaskList(
+        req.body.name,
+        req.body.description,
+        [],
+        false
+    ));
+    res.statusCode = 201;
+    res.json(req.body);
+});
+
+router.get('/:id', function (req, res, next) {
+
+    res.json(mockLists[req.params.id]);
+});
+
+router.put('/:id', function (req, res, next) {
+
+    // mockLists.push(req.body.taskList);
+    // TaskListRepository.CreateTaskList(mockLists[0]);
+    // res.statusCode = 200;
+    // res.json(mockLists[0]);
+});
+
+router.delete('/:id', function (req, res, next) {
+    // mockLists.push(req.body.taskList);
+    // TaskListRepository.CreateTaskList(mockLists[0]);
+    // res.statusCode = 200;
+    // res.json(mockLists[0]);
 });
 
 module.exports = router;
