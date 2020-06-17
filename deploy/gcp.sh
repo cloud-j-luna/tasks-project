@@ -4,7 +4,7 @@ PROJECT_ID=track-those-tasks
 K8s_CLUSTER=ttt-development-cluster
 ZONE=europe-west1-b
 
-IMAGE_NAME=travis-k8s-demo
+IMAGE_NAME=ttt-tasks
 IMAGE_VERSION=v1
 
 if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then
