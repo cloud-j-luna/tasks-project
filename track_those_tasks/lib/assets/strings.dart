@@ -14,3 +14,5 @@ const String TASK_ACTION_DONE = "Complete";
 const String TASK_ACTION_RESUME = "Resume";
 const String TASK_ACTION_ARCHIVE = "Archive";
 const String TASK_ACTION_PAUSE = "Pause";
+const String TASK_ACTION_ADD_ATTACHMENT = "Add Attachment";
+const String TASK_ACTION_SHOW_ATTACHMENT = "Show Attachment";
