@@ -8,6 +8,7 @@ import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task.dart';
 import 'package:trackthosetasks/models/task_list.dart';
+import 'package:trackthosetasks/screens/views/show_attachment_screen.dart';
 import 'package:trackthosetasks/screens/views/take_picture_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_settings_screen.dart';
 import 'package:uuid/uuid.dart';
@@ -41,7 +42,6 @@ class _TaskListScreen extends State<TaskListScreen> {
 
     proxSubscription = proximityEvents.listen((event) {
       if (_proximityIn) {
-        log("Prox IN");
       } else {
         if (_paused)
           _selectedTaskListBloc.resumeCurrentTasks();
@@ -49,7 +49,6 @@ class _TaskListScreen extends State<TaskListScreen> {
           _selectedTaskListBloc.pauseCurrentTasks();
 
         _paused = !_paused;
-        log("Prox OUT");
       }
       _proximityIn = !_proximityIn;
     });
@@ -334,7 +333,12 @@ class _TaskListScreen extends State<TaskListScreen> {
     ));
     actions.add(FlatButton(
       child: Text(TASK_ACTION_SHOW_ATTACHMENT),
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return ShowAttachmentScreenState(task: task);
+        }));
+      },
     ));
 
     return actions;

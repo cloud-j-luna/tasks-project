@@ -43,6 +43,10 @@ class Task {
     this.attachmentPaths.add(path);
   }
 
+  void removeAttachmentPath(int index){
+    this.attachmentPaths.removeAt(index);
+  }
+
   void startTask() {
     this.status = TaskStatus.doing;
     startTimestamp = DateTime.now();

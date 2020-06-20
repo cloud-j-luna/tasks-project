@@ -16,3 +16,4 @@ const String TASK_ACTION_ARCHIVE = "Archive";
 const String TASK_ACTION_PAUSE = "Pause";
 const String TASK_ACTION_ADD_ATTACHMENT = "Add Attachment";
 const String TASK_ACTION_SHOW_ATTACHMENT = "Show Attachment";
+const String NO_ATTACHMENT = "No attachments";
