@@ -1,29 +1,31 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:trackthosetasks/assets/colors.dart';
 
 class ScreenStyles {
-  TextStyle baseTextStyle,
-      headerTextStyle,
-      regularTextStyle,
-      subHeaderTextStyle;
+  TextStyle baseTextStyle = TextStyle(fontFamily: 'Roboto');
 
-  factory ScreenStyles() {
-    return _instance;
-  }
-  static final ScreenStyles _instance = ScreenStyles._privateContructor();
+  TextStyle headerTextStyle = TextStyle(
+      color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.w600);
 
-  ScreenStyles._privateContructor() {
-    baseTextStyle = TextStyle(fontFamily: 'Roboto');
+  TextStyle regularTextStyle = TextStyle(
+      color: Colors.grey[800], fontSize: 9.0, fontWeight: FontWeight.w400);
 
-    headerTextStyle = baseTextStyle.copyWith(
-        color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.w600);
+  TextStyle subHeaderTextStyle = TextStyle(fontSize: 12.0);
 
-    regularTextStyle = baseTextStyle.copyWith(
-        color: Colors.grey[800],
-        fontSize: 9.0,
-        fontWeight: FontWeight.w400);
+  TextStyle reportCardStyleNumber = TextStyle(
+      color: CustomColors.secondaryTextColor,
+      fontWeight: FontWeight.bold,
+      fontSize: 28.0);
 
-    subHeaderTextStyle = regularTextStyle.copyWith(fontSize: 12.0);
-  }
+  TextStyle reportCardStyleTitle = TextStyle(
+      color: CustomColors.secondaryTextColor,
+      fontWeight: FontWeight.w600,
+      fontSize: 16.0);
+
+  TextStyle reportCardStyleSubtitle = TextStyle(
+      color: CustomColors.secondaryTextColor,
+      fontWeight: FontWeight.w600,
+      fontSize: 12.0);
 }

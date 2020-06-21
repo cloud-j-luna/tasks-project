@@ -3,9 +3,12 @@ import 'package:trackthosetasks/models/user.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  User currentUser;
 
   User _convertUserFromFirebaseUser(FirebaseUser user) {
-    return user != null ? new User(uid: user.uid) : null;
+    if (user == null) return null;
+    currentUser = new User(uuid: user.uid);
+    return currentUser;
   }
 
   Stream<User> get user {

@@ -6,6 +6,7 @@ class Task {
   List<Duration> intervals;
   List<String> attachmentPaths;
   DateTime startTimestamp;
+  DateTime completeDate;
 
   Task({this.uuid, this.title, this.description}) {
     this.status = TaskStatus.none;
@@ -59,6 +60,7 @@ class Task {
 
   void finishTask() {
     this.status = TaskStatus.done;
+    this.completeDate = DateTime.now();
     _endInterval();
   }
 

@@ -1,40 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:trackthosetasks/assets/colors.dart';
+import 'package:trackthosetasks/assets/strings.dart';
+import 'package:trackthosetasks/models/user.dart';
+import 'package:trackthosetasks/services/auth.dart';
 
-
-class ProfileView extends StatefulWidget {
-  const ProfileView({Key key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key key}) : super(key: key);
 
   @override
-  _ProfileViewState createState() => _ProfileViewState();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
-  TextEditingController _textController;
-
-  @override
-  void initState() {
-    super.initState();
-    _textController = TextEditingController(
-      text: 'Profile',
-    );
-  }
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _authService = AuthService();
+  User _user;
 
   @override
   Widget build(BuildContext context) {
+    _user = Provider.of<User>(context);
+
     return Scaffold(
+      appBar: AppBar(
+        title: _user == null ? null : Text(_user.uuid),
+      ),
       backgroundColor: CustomColors.primaryLightColor,
       body: Container(
         padding: const EdgeInsets.all(32.0),
         alignment: Alignment.center,
-        child: TextField(controller: _textController),
+        child: Column(
+          children: <Widget>[
+            RaisedButton(
+              child: Text(PROFILE_LOGOUT),
+              onPressed: () async {
+                await _authService.signOut();
+                await Navigator.pop(context);
+              },
+            )
+          ],
+        ),
       ),
     );
   }
 
   @override
   void dispose() {
-    _textController.dispose();
     super.dispose();
   }
 }

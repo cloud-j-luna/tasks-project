@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:camera/camera.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
 import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task.dart';
 import 'package:trackthosetasks/models/task_list.dart';
+import 'package:trackthosetasks/screens/views/report_screen.dart';
 import 'package:trackthosetasks/screens/views/show_attachment_screen.dart';
 import 'package:trackthosetasks/screens/views/take_picture_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_settings_screen.dart';
@@ -40,18 +42,25 @@ class _TaskListScreen extends State<TaskListScreen> {
     _proximityIn = false;
     _paused = false;
 
-    proxSubscription = proximityEvents.listen((event) {
-      if (_proximityIn) {
-      } else {
-        if (_paused)
-          _selectedTaskListBloc.resumeCurrentTasks();
-        else
-          _selectedTaskListBloc.pauseCurrentTasks();
+    () async {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
-        _paused = !_paused;
+      if (androidInfo.isPhysicalDevice) {
+        proxSubscription = proximityEvents.listen((event) {
+          if (_proximityIn) {
+          } else {
+            if (_paused)
+              _selectedTaskListBloc.resumeCurrentTasks();
+            else
+              _selectedTaskListBloc.pauseCurrentTasks();
+
+            _paused = !_paused;
+          }
+          _proximityIn = !_proximityIn;
+        });
       }
-      _proximityIn = !_proximityIn;
-    });
+    }();
   }
 
   _startTimeCounter() {
@@ -116,6 +125,15 @@ class _TaskListScreen extends State<TaskListScreen> {
             appBar: AppBar(
               title: Text(_taskList.name),
               actions: <Widget>[
+                IconButton(
+                  onPressed: () => {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReportScreen(_taskList)))
+                  },
+                  icon: Icon(Icons.receipt),
+                ),
                 IconButton(
                   onPressed: () => {
                     Navigator.push(

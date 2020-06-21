@@ -1,12 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:trackthosetasks/BLoC/app_bloc.dart';
 import 'package:trackthosetasks/BLoC/bloc_provider.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
-import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
 import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task_list.dart';
+import 'package:trackthosetasks/screens/views/profile_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -60,6 +59,15 @@ class _DashboardScreen extends State<DashboardScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text("YOUR LISTS"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()));
+            },
+          )
+        ],
       ),
       body: _buildSearch(context, _dashBoardBloc),
       floatingActionButton: FloatingActionButton(

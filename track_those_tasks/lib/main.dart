@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trackthosetasks/screens/views/dashboard_screen.dart';
+import 'package:trackthosetasks/screens/wrapper.dart';
 import 'package:trackthosetasks/services/auth.dart';
 
 import 'models/user.dart';
@@ -24,7 +24,7 @@ class TrackThoseTasks extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: DashboardScreen(),
+      home: Wrapper(),
       navigatorObservers: [routeObserver],
     );
   }
