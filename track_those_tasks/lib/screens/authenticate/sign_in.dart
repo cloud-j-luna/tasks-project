@@ -24,11 +24,11 @@ class _SignInState extends State<SignIn> {
             child: Text('Sign In as Guest'),
             onPressed: () async {
               dynamic result = await _authService.signInAnon();
-              if(result == null) {
+              if (result == null) {
                 print('Error signing in');
               } else {
                 print('Signed in');
-                print(result.uid);
+                print(result.uuid);
               }
             },
           ),

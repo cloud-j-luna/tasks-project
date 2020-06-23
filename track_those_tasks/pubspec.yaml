@@ -31,6 +31,7 @@ dependencies:
   camera: ^0.5.8+2
   path_provider: ^1.6.10
   path: ^1.7.0
+  device_info: ^0.4.2+4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
