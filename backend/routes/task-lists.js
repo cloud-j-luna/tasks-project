@@ -24,23 +24,20 @@ router.post('/', function (req, res, next) {
 });
 
 router.get('/:id', function (req, res, next) {
-
-    res.json(mockLists[req.params.id]);
+    console.log(req.params.id);
+    TaskListRepository.Read(data => {
+        res.json(data);
+    }, req.params.id);
 });
 
 router.put('/:id', function (req, res, next) {
-
-    // mockLists.push(req.body.taskList);
-    // TaskListRepository.CreateTaskList(mockLists[0]);
-    // res.statusCode = 200;
-    // res.json(mockLists[0]);
+    TaskListRepository.Update(req.body, req.params.id);
+    res.end();
 });
 
 router.delete('/:id', function (req, res, next) {
-    // mockLists.push(req.body.taskList);
-    // TaskListRepository.CreateTaskList(mockLists[0]);
-    // res.statusCode = 200;
-    // res.json(mockLists[0]);
+    TaskListRepository.Delete(req.params.id);
+    res.end();
 });
 
 module.exports = router;
