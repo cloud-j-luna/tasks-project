@@ -2,6 +2,7 @@ const TaskList = require('../models/task-list').TaskList;
 const TaskListRepository = require('../repository/task-list');
 var express = require('express');
 const { Task } = require('../models/task');
+const taskList = require('../models/task-list');
 var router = express.Router();
 
 router.get('/', function (req, res, next) {
@@ -12,19 +13,45 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-    console.log(req.body);
-    for(let tasklist of req.body) {
-        TaskListRepository.Create(new TaskList(
-            tasklist.uuid,
-            tasklist.name,
-            tasklist.tasks,
-            tasklist.isFavourite,
-            tasklist.settings
-        ));
-    }
-    
-    res.statusCode = 201;
-    res.json(req.body);
+    TaskListRepository.Read(data => {
+        let all = data;
+
+        console.log(all);
+
+        for(let tasklist of req.body) {
+            if(!taskList.id) {
+                TaskListRepository.Create(new TaskList(
+                    tasklist.uuid,
+                    tasklist.name,
+                    tasklist.tasks,
+                    tasklist.isFavourite,
+                    tasklist.settings
+                ));
+                continue;
+            }
+            
+            for(let t of all) {
+                if(t.id === tasklist.id) {
+                    TaskListRepository.Update(tasklist, tasklist.id);
+                    break;
+                }
+            }
+        }
+
+        for(let t of all) {
+            let foundInBody = false;
+            for(let tasklist of req.body) {
+                if(t.id === tasklist.id) {
+                    foundInBody = true;
+                    break;
+                }
+            }
+            if(!foundInBody) TaskListRepository.Delete(t.id);
+        }
+        
+        res.statusCode = 201;
+        res.json(req.body);
+    });
 });
 
 router.get('/:id', function (req, res, next) {
