@@ -1,5 +1,6 @@
 class TaskList {
-    constructor(name, description, tasks, isFavourite, settings) {
+    constructor(uuid, name, description, tasks, isFavourite, settings) {
+        this._uuid = uuid;
         this._name = name;
         this._description = description;
         this._tasks = tasks;
@@ -9,6 +10,9 @@ class TaskList {
 
     get id() { return this._id }
     set id(val) { this._id = val }
+
+    get uuid() { return this._uuid }
+    set uuid(val) { this._uuid = val }
 
     get name() { return this._name }
     set name(val) { this._name = val }

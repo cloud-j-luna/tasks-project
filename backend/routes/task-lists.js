@@ -15,6 +15,7 @@ router.post('/', function (req, res, next) {
     console.log(req.body);
     for(let tasklist of req.body) {
         TaskListRepository.Create(new TaskList(
+            tasklist.uuid,
             tasklist.name,
             tasklist.description,
             tasklist.tasks,
