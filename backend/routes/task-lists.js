@@ -17,7 +17,6 @@ router.post('/', function (req, res, next) {
         TaskListRepository.Create(new TaskList(
             tasklist.uuid,
             tasklist.name,
-            tasklist.description,
             tasklist.tasks,
             tasklist.isFavourite,
             tasklist.settings
