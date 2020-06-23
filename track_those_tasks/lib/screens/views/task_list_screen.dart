@@ -6,7 +6,9 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
 import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
+import 'package:trackthosetasks/assets/colors.dart';
 import 'package:trackthosetasks/assets/strings.dart';
+import 'package:trackthosetasks/assets/styles.dart';
 import 'package:trackthosetasks/models/task.dart';
 import 'package:trackthosetasks/models/task_list.dart';
 import 'package:trackthosetasks/screens/views/report_screen.dart';
@@ -65,13 +67,16 @@ class _TaskListScreen extends State<TaskListScreen> {
 
   _startTimeCounter() {
     print("started");
-    setState(() {}); // force UI update
+    if (mounted) setState(() {});
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
-      (Timer timer) => setState(
-        () {},
-      ),
+      (_) {
+        if (mounted)
+          setState(
+            () {},
+          );
+      },
     );
   }
 
@@ -83,8 +88,9 @@ class _TaskListScreen extends State<TaskListScreen> {
 
   @override
   void dispose() {
+    proxSubscription?.cancel();
     _timer?.cancel();
-    proxSubscription.cancel();
+
     super.dispose();
   }
 
@@ -92,6 +98,8 @@ class _TaskListScreen extends State<TaskListScreen> {
   Widget build(BuildContext context) {
     final _dashboardBloc = widget.dashboardBloc;
     TaskList _taskList = _selectedTaskListBloc.selectedTaskList;
+
+    if (_taskList.activeTasks > 0) _startTimeCounter();
 
     _updateCurrentTaskList(TaskList updatedTaskList) {
       _selectedTaskListBloc.updateTaskList(updatedTaskList);
@@ -124,6 +132,7 @@ class _TaskListScreen extends State<TaskListScreen> {
           return Scaffold(
             appBar: AppBar(
               title: Text(_taskList.name),
+              backgroundColor: CustomColors.primaryDarkColor,
               actions: <Widget>[
                 IconButton(
                   onPressed: () => {
@@ -137,11 +146,12 @@ class _TaskListScreen extends State<TaskListScreen> {
                 IconButton(
                   onPressed: () => {
                     Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TaskListSettingsScreen(
-                                    _taskList, _dashboardBloc)))
-                        .then((value) => _updateCurrentTaskList(value))
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TaskListSettingsScreen(
+                                _taskList, _dashboardBloc))).then((value) {
+                      if (value != null) _updateCurrentTaskList(value);
+                    })
                   },
                   icon: Icon(Icons.settings),
                 ),
@@ -167,54 +177,52 @@ class _TaskListScreen extends State<TaskListScreen> {
 
                   log("Creating task with title: $title : $description");
                   Task task = Task(
-                      uuid: Uuid().toString(),
+                      uuid: Uuid().v4().toString(),
                       title: title,
                       description: description);
 
                   _taskList.addTask(task);
                   _selectedTaskListBloc.updateTaskList(_taskList);
+                  _dashboardBloc.saveTaskLists();
                 });
               },
               child: Icon(Icons.add),
-              backgroundColor: Colors.green,
+              backgroundColor: CustomColors.primaryDarkColor,
             ),
             body: _taskList.tasks == null
                 ? Text(TASK_LIST_EMPTY)
                 : Container(
                     padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
                     width: double.maxFinite,
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(_taskList.name),
-                        ),
-                        _buildListOfTasks(_taskList, _selectedTaskListBloc),
-                      ],
-                    ),
+                    child: _buildListOfTasks(_taskList, _selectedTaskListBloc),
                   ),
           );
         });
   }
 
   Widget _buildListOfTasks(TaskList taskList, SelectedTaskListBloc bloc) {
-    return Expanded(
-        child: ListView.builder(
-            itemCount: taskList.tasks?.length,
-            itemBuilder: (context, index) {
-              Task task = taskList.tasks[index];
-              return _buildTaskCard(task, bloc);
-            }));
+    return ListView.builder(
+        itemCount: taskList.tasks?.length,
+        itemBuilder: (context, index) {
+          Task task = taskList.tasks[index];
+          return _buildTaskCard(task, bloc);
+        });
   }
 
   Widget _buildTaskCard(Task task, SelectedTaskListBloc bloc) {
+    final _styles = ScreenStyles();
+
     return Card(
         child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ListTile(
-          trailing: Icon(Icons.more_vert),
-          title: Text(task.title),
+          title: Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+              child: Text(
+                task.title,
+                style: _styles.taskCardTitle,
+              )),
           subtitle: Text(task.description),
           isThreeLine: true,
         ),
@@ -249,11 +257,11 @@ class _TaskListScreen extends State<TaskListScreen> {
             top: -40.0,
             child: InkResponse(
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
               child: CircleAvatar(
                 child: Icon(Icons.close),
-                backgroundColor: Colors.red,
+                backgroundColor: CustomColors.primaryDarkColor,
               ),
             ),
           ),
@@ -281,6 +289,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: RaisedButton(
                     child: Text(TASK_LIST_ADD_TASK_SUBMIT),
+                    color: CustomColors.primaryLightColor,
                     onPressed: () {
                       Navigator.pop(dialogContext,
                           [_titleController.text, _descriptionController.text]);
@@ -308,18 +317,21 @@ class _TaskListScreen extends State<TaskListScreen> {
     if (task.status == TaskStatus.inProgress)
       actions.add(FlatButton(
         child: Text(TASK_ACTION_RESUME),
+        textColor: CustomColors.primaryColor,
         onPressed: () => _startTask(),
       ));
 
     if (task.status == TaskStatus.none)
       actions.add(FlatButton(
         child: Text(TASK_ACTION_START),
+        textColor: CustomColors.primaryColor,
         onPressed: () => _startTask(),
       ));
 
     if (task.status == TaskStatus.doing) {
       actions.add(FlatButton(
         child: Text(TASK_ACTION_PAUSE),
+        textColor: CustomColors.primaryColor,
         onPressed: () {
           task.pauseTask();
           _stopTimeCounter();
@@ -328,6 +340,7 @@ class _TaskListScreen extends State<TaskListScreen> {
 
       actions.add(FlatButton(
         child: Text(TASK_ACTION_DONE),
+        textColor: CustomColors.primaryColor,
         onPressed: () {
           task.finishTask();
           _selectedTaskListBloc.removeCurrentTask(task);
@@ -338,6 +351,7 @@ class _TaskListScreen extends State<TaskListScreen> {
 
     actions.add(FlatButton(
       child: Text(TASK_ACTION_ADD_ATTACHMENT),
+      textColor: CustomColors.primaryColor,
       onPressed: () async {
         final cameras = await availableCameras();
 
@@ -346,11 +360,15 @@ class _TaskListScreen extends State<TaskListScreen> {
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
           return TakePictureScreen(camera: firstCamera);
-        })).then((value) => task.addAttachmentPath(value));
+        })).then((value) {
+          task.addAttachmentPath(value);
+          setState(() {});
+        });
       },
     ));
     actions.add(FlatButton(
       child: Text(TASK_ACTION_SHOW_ATTACHMENT),
+      textColor: CustomColors.primaryColor,
       onPressed: () {
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {

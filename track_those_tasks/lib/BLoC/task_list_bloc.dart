@@ -38,6 +38,9 @@ class SelectedTaskListBloc implements Bloc {
 
   void addCurrentTask(Task task) {
     if (currentTasks.indexWhere((t) => t.uuid == task.uuid) >= 0) return;
+    if (!_taskList.settings.allowsSimultaneousTasks) {
+      currentTasks.clear();
+    }
     currentTasks.add(task);
   }
 
@@ -53,7 +56,7 @@ class SelectedTaskListBloc implements Bloc {
   }
 
   void resumeCurrentTasks() {
-    if(currentTasks.isEmpty) return;
+    if (currentTasks.isEmpty) return;
     currentTasks.forEach((task) {
       task.startTask();
     });

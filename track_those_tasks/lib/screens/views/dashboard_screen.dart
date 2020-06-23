@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/BLoC/bloc_provider.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
+import 'package:trackthosetasks/assets/colors.dart';
 import 'package:trackthosetasks/assets/strings.dart';
+import 'package:trackthosetasks/assets/styles.dart';
 import 'package:trackthosetasks/models/task_list.dart';
 import 'package:trackthosetasks/screens/views/profile_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_screen.dart';
@@ -35,7 +37,7 @@ class _DashboardScreen extends State<DashboardScreen>
     // These are the callbacks
     switch (state) {
       case AppLifecycleState.resumed:
-        _dashBoardBloc.getFromFile();
+        // _dashBoardBloc.getFromFile();
         break;
       case AppLifecycleState.inactive:
         // widget is inactive
@@ -49,6 +51,8 @@ class _DashboardScreen extends State<DashboardScreen>
     }
   }
 
+  final _styles = ScreenStyles();
+
   DashboardBloc _dashBoardBloc;
   @override
   Widget build(BuildContext context) {
@@ -59,6 +63,7 @@ class _DashboardScreen extends State<DashboardScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text("YOUR LISTS"),
+        backgroundColor: CustomColors.primaryDarkColor,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.person),
@@ -77,12 +82,13 @@ class _DashboardScreen extends State<DashboardScreen>
               builder: (BuildContext dialogContext) {
                 return _buildAddTaskListForm(context, dialogContext);
               }).then((value) {
+            if (value == null) return;
             print(value);
             _dashBoardBloc.addTaskList(value);
           });
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.green,
+        backgroundColor: CustomColors.primaryDarkColor,
       ),
     );
   }
@@ -105,7 +111,7 @@ class _DashboardScreen extends State<DashboardScreen>
         final results = snapshot.data;
 
         if (results == null) {
-          bloc.getFromFile();
+          // bloc.getFromFile();
           return Center(child: Text('Error no Lists'));
         }
 
@@ -141,7 +147,10 @@ class _DashboardScreen extends State<DashboardScreen>
                       _dashBoardBloc,
                     )));
       },
-      title: Text(taskList.name),
+      title: Text(
+        taskList.name,
+        style: _styles.dashboardTaskListItem,
+      ),
       trailing: Icon(Icons.keyboard_arrow_right),
     );
   }
@@ -159,11 +168,11 @@ class _DashboardScreen extends State<DashboardScreen>
             top: -40.0,
             child: InkResponse(
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
               child: CircleAvatar(
                 child: Icon(Icons.close),
-                backgroundColor: Colors.red,
+                backgroundColor: CustomColors.primaryDarkColor,
               ),
             ),
           ),
@@ -182,6 +191,7 @@ class _DashboardScreen extends State<DashboardScreen>
                   padding: const EdgeInsets.all(8.0),
                   child: RaisedButton(
                     child: Text(TASK_LIST_CREATE),
+                    color: CustomColors.primaryLightColor,
                     onPressed: () {
                       Navigator.pop(dialogContext, _textController.text);
                     },

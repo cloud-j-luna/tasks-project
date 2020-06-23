@@ -14,6 +14,13 @@ class ScreenStyles {
 
   TextStyle subHeaderTextStyle = TextStyle(fontSize: 12.0);
 
+
+  TextStyle dashboardTaskListItem =
+      TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600);
+
+  TextStyle taskCardTitle =
+      TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600);
+
   TextStyle reportCardStyleNumber = TextStyle(
       color: CustomColors.secondaryTextColor,
       fontWeight: FontWeight.bold,

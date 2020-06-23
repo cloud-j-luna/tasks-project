@@ -25,7 +25,7 @@ class _ReportScreen extends State<ReportScreen> {
     log((taskList?.settings == null).toString());
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: CustomColors.primaryColor,
+          backgroundColor: CustomColors.primaryDarkColor,
           title: Text("${taskList.name}$REPORTING_TITLE"),
         ),
         body: SingleChildScrollView(

@@ -15,36 +15,33 @@ class DashboardBloc implements Bloc {
 
   Stream<List<TaskList>> get listsStream => _controller.stream;
 
-  sinkTaskList(TaskList taskList) {
-    if (lists.indexWhere((element) => element.uuid == taskList.uuid) >= 0) {
-      updateTaskList(taskList);
-    } else {
-      addTaskList(taskList.name);
-    }
-  }
-
   @override
   void dispose() {
     _controller.close();
   }
 
-  void getFromFile() async {
-    log("gettings task lists from file");
-    lists.clear();
-    lists.addAll(await service.taskLists);
-    _controller.add(lists);
+  DashboardBloc() {
+    () async {
+      return await service.taskLists;
+    }()
+        .then((l) {
+      lists.addAll(l);
+      _controller.add(lists);
+    });
   }
 
-  void saveToFile() async {
-    log("Savint file");
+  void saveTaskLists() async {
+    print(lists);
     await service.saveTaskLists(lists);
   }
 
   void addTaskList(String name) {
-    TaskList taskList = TaskList(uuid: Uuid().toString(), name: name);
+    TaskList taskList = TaskList(uuid: Uuid().v4().toString(), name: name);
 
     lists.add(taskList);
     _controller.add(lists);
+
+    saveTaskLists();
   }
 
   bool removeTaskList(String uuid) {
@@ -52,6 +49,8 @@ class DashboardBloc implements Bloc {
 
     if (index == -1) return false;
     TaskList removedTaskList = lists.removeAt(index);
+
+    saveTaskLists();
     return removedTaskList != null;
   }
 
@@ -60,6 +59,8 @@ class DashboardBloc implements Bloc {
     if (index == -1) return false;
     lists[index] = updatedTaskList;
     _controller.add(lists);
+
+    saveTaskLists();
     return true;
   }
 
@@ -73,5 +74,7 @@ class DashboardBloc implements Bloc {
     list.addTask(task);
     lists[index] = list;
     _controller.add(lists);
+
+    saveTaskLists();
   }
 }

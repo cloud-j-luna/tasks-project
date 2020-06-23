@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:trackthosetasks/assets/strings.dart';
 import 'package:trackthosetasks/models/task.dart';
 
 class ShowAttachmentScreenState extends StatefulWidget {
