@@ -24,7 +24,10 @@ admin.initializeApp({
 let db = admin.firestore();
 
 exports.Create = function (tasklist) {
-    let docRef = db.collection('tasklist').doc(uuidv4());
+    let id = uuidv4();
+    let docRef = db.collection('tasklist').doc(id);
+
+    tasklist.id = id;
 
     let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).
 }
@@ -35,18 +38,22 @@ exports.Read = function (callback, tasklistId) {
         db.collection('tasklist').get().then(snapshot => {
             const col = [];
             snapshot.forEach((doc) => {
-                col.push(doc.data());
+                let tasklist = doc.data();
+                tasklist.id = doc.id;
+                col.push(tasklist);
             });
             callback(col);
         });
     } else {
         db.collection('tasklist').doc(tasklistId).get().then(doc => {
-            callback(doc.data());
+            let tasklist = doc.data();
+            tasklist.id = tasklistId;
+            callback(tasklist);
         });
     }
 }
 
-exports.Update = function (tasklist, tasklistId) {
+exports.Update = function (tasklistId) {
     let docRef = db.collection('tasklist').doc(tasklistId);
 
     let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).

@@ -1,12 +1,14 @@
 class TaskList {
-    constructor(name, description, tasks, isFavourite) {
+    constructor(name, description, tasks, isFavourite, allowsSimultaneousTasks) {
         this._name = name;
         this._description = description;
         this._tasks = tasks;
         this._isFavourite = isFavourite;
+        this._allowsSimultaneousTasks = allowsSimultaneousTasks;
     }
 
     get id() { return this._id }
+    set id(val) { this._id = val }
 
     get name() { return this._name }
     set name(val) { this._name = val }
@@ -19,6 +21,9 @@ class TaskList {
 
     get isFavourite() { return this._isFavourite }
     set isFavourite(val) { this._isFavourite = val }
+
+    get allowsSimultaneousTasks() { return this._allowsSimultaneousTasks }
+    set allowsSimultaneousTasks(val) { this._allowsSimultaneousTasks = val }
 }
 
 module.exports = {
