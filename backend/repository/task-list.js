@@ -31,23 +31,28 @@ exports.Create = function (tasklist) {
 
 exports.Read = function (callback, tasklistId) {
 
-    if(!tasklistId) db.collection('tasklist').get().then(snapshot => {
-        const col = [];
-        snapshot.forEach((doc) => {
-            col.push(doc.data());
+    if(!tasklistId) {
+        db.collection('tasklist').get().then(snapshot => {
+            const col = [];
+            snapshot.forEach((doc) => {
+                col.push(doc.data());
+            });
+            callback(col);
         });
-        callback(col);
-    });
+    } else {
+        db.collection('tasklist').doc(tasklistId).get().then(doc => {
+            callback(doc.data());
+        });
+    }
 }
 
-exports.Update = function (tasklist) {
-    let docRef = db.collection('tasklist').doc(uuidv4());
+exports.Update = function (tasklist, tasklistId) {
+    let docRef = db.collection('tasklist').doc(tasklistId);
 
     let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).
 }
 
-exports.Delete = function (tasklist) {
-    let docRef = db.collection('tasklist').doc(uuidv4());
-
-    let setAda = docRef.set(Object.assign({}, tasklist));   // Firestore doesn't support object with custom prototype (new).
+exports.Delete = function (tasklistId) {
+    let docRef = db.collection('tasklist').doc(tasklistId);
+    docRef.delete();
 }
