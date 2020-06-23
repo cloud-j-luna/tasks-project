@@ -13,12 +13,16 @@ router.get('/', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
     console.log(req.body);
-    TaskListRepository.Create(new TaskList(
-        req.body.name,
-        req.body.description,
-        [],
-        false
-    ));
+    for(let tasklist of req.body) {
+        TaskListRepository.Create(new TaskList(
+            tasklist.name,
+            tasklist.description,
+            tasklist.tasks,
+            tasklist.isFavourite,
+            tasklist.settings
+        ));
+    }
+    
     res.statusCode = 201;
     res.json(req.body);
 });
