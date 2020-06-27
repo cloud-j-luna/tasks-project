@@ -82,7 +82,7 @@ class Task {
     _endInterval();
   }
 
-  void finishTask() {
+  void completeTask() {
     this.status = TaskStatus.done;
     this.completeDate = DateTime.now();
     _endInterval();

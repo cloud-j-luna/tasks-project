@@ -63,6 +63,30 @@ class SelectedTaskListBloc implements Bloc {
     _taskListController.add(_taskList);
   }
 
+  void completeCurrentTask() {
+    if (currentTasks.isEmpty) return;
+
+    currentTasks.forEach((task) {
+      task.completeTask();
+    });
+
+    if (_taskList.settings.isContinous) {
+      var indexCurrentTask = _taskList.tasks.indexOf(currentTasks.first);
+      var indexNextTask = indexCurrentTask + 1;
+      while (indexNextTask < _taskList.tasks.length) {
+        final task = _taskList.tasks[indexNextTask];
+        if (task.status == TaskStatus.none ||
+            task.status == TaskStatus.inProgress) {
+          task.startTask();
+          addCurrentTask(task);
+          break;
+        }
+
+        indexNextTask++;
+      }
+    }
+  }
+
   @override
   void dispose() {
     _taskListController.close();

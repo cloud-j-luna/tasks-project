@@ -37,12 +37,14 @@ class _TaskListScreen extends State<TaskListScreen> {
   StreamSubscription proxSubscription;
   bool _proximityIn;
   bool _paused;
+  DateTime _startProx;
 
   _TaskListScreen(TaskList selectedTaskList) {
     _selectedTaskListBloc = SelectedTaskListBloc();
     _selectedTaskListBloc.selectTaskList(selectedTaskList);
     _proximityIn = false;
     _paused = false;
+    bool _proximityFirst = true;
 
     () async {
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -50,22 +52,39 @@ class _TaskListScreen extends State<TaskListScreen> {
 
       if (androidInfo.isPhysicalDevice) {
         proxSubscription = proximityEvents.listen((event) {
-          if (_proximityIn) {
-          } else {
-            if (_paused)
-              _selectedTaskListBloc.resumeCurrentTasks();
-            else
-              _selectedTaskListBloc.pauseCurrentTasks();
-
-            _paused = !_paused;
+          // Workout for starting event...
+          if (_proximityFirst) {
+            _proximityFirst = false;
+            return;
           }
           _proximityIn = !_proximityIn;
+
+          if (_proximityIn) {
+            print('IN');
+            _startProx = DateTime.now();
+          } else {
+            print('OUT');
+            final _endProx = DateTime.now();
+            final duration = _endProx.difference(_startProx);
+            print("Duration ${duration.inSeconds}");
+            if (duration >= Duration(seconds: 2)) {
+              _selectedTaskListBloc.completeCurrentTask();
+            } else {
+              if (_paused)
+                _selectedTaskListBloc.resumeCurrentTasks();
+              else
+                _selectedTaskListBloc.pauseCurrentTasks();
+
+              _paused = !_paused;
+            }
+          }
         });
       }
     }();
   }
 
   _startTimeCounter() {
+    if (_timer != null && _timer.isActive) return;
     print("started");
     if (mounted) setState(() {});
     const oneSec = const Duration(seconds: 1);
@@ -98,8 +117,6 @@ class _TaskListScreen extends State<TaskListScreen> {
   Widget build(BuildContext context) {
     final _dashboardBloc = widget.dashboardBloc;
     TaskList _taskList = _selectedTaskListBloc.selectedTaskList;
-
-    if (_taskList.activeTasks > 0) _startTimeCounter();
 
     _updateCurrentTaskList(TaskList updatedTaskList) {
       _selectedTaskListBloc.updateTaskList(updatedTaskList);
@@ -342,7 +359,8 @@ class _TaskListScreen extends State<TaskListScreen> {
         child: Text(TASK_ACTION_DONE),
         textColor: CustomColors.primaryColor,
         onPressed: () {
-          task.finishTask();
+          task.completeTask();
+          _selectedTaskListBloc.completeCurrentTask();
           _selectedTaskListBloc.removeCurrentTask(task);
           _stopTimeCounter();
         },

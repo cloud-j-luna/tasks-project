@@ -80,18 +80,23 @@ class TaskList {
 
 class TaskListSettings {
   bool allowsSimultaneousTasks;
+  bool isContinous;
 
   TaskListSettings() {
     this.allowsSimultaneousTasks = false;
+    this.isContinous = false;
   }
 
   factory TaskListSettings.fromJson(Map<String, dynamic> parsedJson) {
     TaskListSettings self = TaskListSettings();
     self.allowsSimultaneousTasks =
         parsedJson['_allowsSimultaneousTasks'] ?? false;
+    self.isContinous = parsedJson['isContinous'] ?? false;
     return self;
   }
 
-  Map<String, dynamic> toJson() =>
-      {'allowsSimultaneousTasks': this.allowsSimultaneousTasks};
+  Map<String, dynamic> toJson() => {
+        'allowsSimultaneousTasks': this.allowsSimultaneousTasks,
+        'isContinous': this.isContinous,
+      };
 }
