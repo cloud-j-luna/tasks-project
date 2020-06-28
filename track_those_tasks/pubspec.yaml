@@ -34,6 +34,7 @@ dependencies:
   device_info: ^0.4.2+4
   http: ^0.12.1
   json_annotation: ^3.0.1
+  audioplayers: ^0.15.1
 
 
 # For information on the generic Dart part of this file, see the
@@ -50,6 +51,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
   - assets/mock_data.json
+  - assets/sounds/click.mp3
+  - assets/sounds/confirm.mp3
+  - assets/sounds/dong.mp3
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -32,6 +32,7 @@ class DashboardBloc implements Bloc {
 
   void saveTaskLists() async {
     print(lists);
+    _controller..add(lists);
     await service.saveTaskLists(lists);
   }
 

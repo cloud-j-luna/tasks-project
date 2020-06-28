@@ -96,11 +96,13 @@ class _DashboardScreen extends State<DashboardScreen>
   Widget _buildSearch(BuildContext context, DashboardBloc bloc) {
     return BlocProvider<DashboardBloc>(
       bloc: bloc,
-      child: Column(
-        children: <Widget>[
-          Expanded(child: _buildStreamBuilder(bloc)),
-        ],
-      ),
+      child: Ink(
+          color: CustomColors.lighGrey,
+          child: Column(
+            children: <Widget>[
+              Expanded(child: _buildStreamBuilder(bloc)),
+            ],
+          )),
     );
   }
 
@@ -125,17 +127,19 @@ class _DashboardScreen extends State<DashboardScreen>
   }
 
   Widget _buildSearchResults(List<TaskList> results) {
-    return ListView.separated(
+    results.sort((t1, t2) => t1.name.compareTo(t2.name));
+    results.sort((t1, t2) => t1.isFavourite ? 0 : 1);
+
+    return ListView.builder(
       itemCount: results.length,
-      separatorBuilder: (context, index) => Divider(),
       itemBuilder: (context, index) {
         final taskList = results[index];
-        return _tempTile(context, taskList);
+        return _taskListItem_card(context, taskList);
       },
     );
   }
 
-  Widget _tempTile(BuildContext context, TaskList taskList) {
+  Widget _taskListItem(BuildContext context, TaskList taskList) {
     return ListTile(
       onTap: () {
         log("Opening list:  ${taskList.name}");
@@ -145,14 +149,102 @@ class _DashboardScreen extends State<DashboardScreen>
                 builder: (context) => TaskListScreen(
                       taskList,
                       _dashBoardBloc,
-                    )));
+                    ))).then((value) => setState(
+              () {},
+            ));
       },
+      leading: IconButton(
+          icon: taskList.isFavourite
+              ? Icon(Icons.favorite)
+              : Icon(Icons.favorite_border),
+          onPressed: () {
+            print('favourite toggle');
+            taskList.toggleFavourite();
+            _dashBoardBloc.saveTaskLists();
+          }),
       title: Text(
         taskList.name,
         style: _styles.dashboardTaskListItem,
       ),
       trailing: Icon(Icons.keyboard_arrow_right),
     );
+  }
+
+  Widget _taskListItem_card(BuildContext context, TaskList taskList) {
+    return Padding(
+        padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: GestureDetector(
+          
+            onTap: () {
+              log("Opening list:  ${taskList.name}");
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TaskListScreen(
+                            taskList,
+                            _dashBoardBloc,
+                          ))).then((value) => setState(
+                    () {},
+                  ));
+            },
+            child: Card(
+              child: Wrap(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  ListTile(
+                    trailing: IconButton(
+                        icon: taskList.isFavourite
+                            ? Icon(Icons.favorite)
+                            : Icon(Icons.favorite_border),
+                        onPressed: () {
+                          print('favourite toggle');
+                          taskList.toggleFavourite();
+                          _dashBoardBloc.saveTaskLists();
+                        }),
+                    title: Text(
+                      taskList.name,
+                      style: _styles.dashboardTaskListItem,
+                    ),
+                  ),
+                  Divider(),
+                  Center(
+                      child: Padding(
+                          padding: EdgeInsets.fromLTRB(25, 5, 25, 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Tasks: ${taskList.totalTasks}"),
+                              Spacer(),
+                              Text("Completed: ${taskList.completedTaks}"),
+                              Spacer(),
+                              Text("Active: ${taskList.activeTasks}"),
+                            ],
+                          ))),
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(25, 5, 25, 15),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Expanded(
+                              child: LinearProgressIndicator(
+                                  semanticsLabel: "Completiong %",
+                                  semanticsValue: "33%",
+                                  backgroundColor:
+                                      CustomColors.primaryLightColor,
+                                  valueColor: AlwaysStoppedAnimation(
+                                      CustomColors.primaryDarkColor),
+                                  value: taskList.totalTasks == 0
+                                      ? 0
+                                      : taskList.completedTaks /
+                                          taskList.totalTasks)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )));
   }
 
   Widget _buildAddTaskListForm(

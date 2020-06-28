@@ -13,5 +13,8 @@ class CustomColors {
   static const primaryTextColor = const Color(0xff000000);
   static const secondaryTextColor = const Color(0xffffffff);
 
+
+  static const lighGrey = const Color(0xffE6E7E8);
+
   static const white = Colors.white;
 }

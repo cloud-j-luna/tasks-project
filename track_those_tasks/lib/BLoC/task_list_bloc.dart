@@ -15,8 +15,6 @@ class SelectedTaskListBloc implements Bloc {
 
   Stream<TaskList> get taskListStream => _taskListController.stream;
 
-  // Sink<TaskList> get updateTaskList => _taskListController.sink;
-
   void selectTaskList(TaskList taskList) {
     _taskList = taskList;
     _taskListController.add(_taskList);

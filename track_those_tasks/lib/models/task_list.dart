@@ -19,6 +19,10 @@ class TaskList {
     this.tasks.add(task);
   }
 
+  void toggleFavourite() {
+    this.isFavourite = !this.isFavourite;
+  }
+
   @override
   String toString() {
     return "[${uuid.toString()}] : $name - ${tasks.length} tasks ";

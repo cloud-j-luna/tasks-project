@@ -15,6 +15,7 @@ import 'package:trackthosetasks/screens/views/report_screen.dart';
 import 'package:trackthosetasks/screens/views/show_attachment_screen.dart';
 import 'package:trackthosetasks/screens/views/take_picture_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_settings_screen.dart';
+import 'package:trackthosetasks/sound_player.dart';
 import 'package:uuid/uuid.dart';
 import 'package:proximity_plugin/proximity_plugin.dart';
 
@@ -22,15 +23,17 @@ import 'package:trackthosetasks/extensions.dart';
 
 class TaskListScreen extends StatefulWidget {
   final selectedTaskList;
-  final DashboardBloc dashboardBloc;
+  DashboardBloc dashboardBloc;
 
   TaskListScreen(this.selectedTaskList, this.dashboardBloc);
 
   @override
-  State<StatefulWidget> createState() => _TaskListScreen(selectedTaskList);
+  State<StatefulWidget> createState() =>
+      _TaskListScreen(selectedTaskList, dashboardBloc);
 }
 
 class _TaskListScreen extends State<TaskListScreen> {
+  DashboardBloc _dashboardBloc;
   Timer _timer;
   SelectedTaskListBloc _selectedTaskListBloc;
 
@@ -39,9 +42,11 @@ class _TaskListScreen extends State<TaskListScreen> {
   bool _paused;
   DateTime _startProx;
 
-  _TaskListScreen(TaskList selectedTaskList) {
+  _TaskListScreen(TaskList selectedTaskList, DashboardBloc dashboardBloc) {
     _selectedTaskListBloc = SelectedTaskListBloc();
     _selectedTaskListBloc.selectTaskList(selectedTaskList);
+
+    _dashboardBloc = dashboardBloc;
     _proximityIn = false;
     _paused = false;
     bool _proximityFirst = true;
@@ -115,10 +120,9 @@ class _TaskListScreen extends State<TaskListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _dashboardBloc = widget.dashboardBloc;
     TaskList _taskList = _selectedTaskListBloc.selectedTaskList;
 
-    _updateCurrentTaskList(TaskList updatedTaskList) {
+    _updateCurrentTaskListSettings(TaskList updatedTaskList) {
       _selectedTaskListBloc.updateTaskList(updatedTaskList);
     }
 
@@ -167,7 +171,8 @@ class _TaskListScreen extends State<TaskListScreen> {
                         MaterialPageRoute(
                             builder: (context) => TaskListSettingsScreen(
                                 _taskList, _dashboardBloc))).then((value) {
-                      if (value != null) _updateCurrentTaskList(value);
+                      if (value != null) _updateCurrentTaskListSettings(value);
+                      _dashboardBloc.saveTaskLists();
                     })
                   },
                   icon: Icon(Icons.settings),
@@ -176,6 +181,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                     builder: (ctx) => IconButton(
                           onPressed: () {
                             _deleteCurrentTaskList(ctx);
+                            _dashboardBloc.saveTaskLists();
                             Navigator.pop(context);
                           },
                           icon: Icon(Icons.delete),
@@ -209,6 +215,7 @@ class _TaskListScreen extends State<TaskListScreen> {
             body: _taskList.tasks == null
                 ? Text(TASK_LIST_EMPTY)
                 : Container(
+                  color: CustomColors.lighGrey,
                     padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
                     width: double.maxFinite,
                     child: _buildListOfTasks(_taskList, _selectedTaskListBloc),
@@ -329,6 +336,8 @@ class _TaskListScreen extends State<TaskListScreen> {
       task.startTask();
       _selectedTaskListBloc.addCurrentTask(task);
       _startTimeCounter();
+      _dashboardBloc.saveTaskLists();
+      SoundPlayer.playClickSound();
     }
 
     if (task.status == TaskStatus.inProgress)
@@ -352,6 +361,8 @@ class _TaskListScreen extends State<TaskListScreen> {
         onPressed: () {
           task.pauseTask();
           _stopTimeCounter();
+          _dashboardBloc.saveTaskLists();
+          SoundPlayer.playDongSound();
         },
       ));
 
@@ -363,6 +374,8 @@ class _TaskListScreen extends State<TaskListScreen> {
           _selectedTaskListBloc.completeCurrentTask();
           _selectedTaskListBloc.removeCurrentTask(task);
           _stopTimeCounter();
+          _dashboardBloc.saveTaskLists();
+          SoundPlayer.playConfirmSound();
         },
       ));
     }
@@ -381,6 +394,7 @@ class _TaskListScreen extends State<TaskListScreen> {
         })).then((value) {
           task.addAttachmentPath(value);
           setState(() {});
+          _dashboardBloc.saveTaskLists();
         });
       },
     ));
@@ -391,7 +405,7 @@ class _TaskListScreen extends State<TaskListScreen> {
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {
           return ShowAttachmentScreenState(task: task);
-        }));
+        })).then((value) => _dashboardBloc.saveTaskLists());
       },
     ));
 
