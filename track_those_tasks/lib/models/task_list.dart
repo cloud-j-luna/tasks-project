@@ -1,14 +1,17 @@
 import 'package:trackthosetasks/models/task.dart';
 
 class TaskList {
+  String id;
   final String uuid;
   String name;
+  bool isFavourite;
   List<Task> tasks;
   TaskListSettings settings;
 
   TaskList({this.uuid, this.name}) {
     this.tasks = List<Task>();
     this.settings = TaskListSettings();
+    this.isFavourite = false;
   }
 
   void addTask(Task task) {
@@ -16,12 +19,24 @@ class TaskList {
     this.tasks.add(task);
   }
 
+  void toggleFavourite() {
+    this.isFavourite = !this.isFavourite;
+  }
+
   @override
   String toString() {
     return "[${uuid.toString()}] : $name - ${tasks.length} tasks ";
   }
 
-/* TOTALS */
+  Map<String, dynamic> toJson() => {
+        'uuid': this.uuid.toString(),
+        'name': this.name,
+        'isFavourite': this.isFavourite,
+        'tasks': this.tasks,
+        'settings': this.settings
+      };
+
+  /* TOTALS */
   int get totalTasks => this.tasks.length;
 
   int get completedTaks =>
@@ -69,8 +84,23 @@ class TaskList {
 
 class TaskListSettings {
   bool allowsSimultaneousTasks;
+  bool isContinous;
 
   TaskListSettings() {
     this.allowsSimultaneousTasks = false;
+    this.isContinous = false;
   }
+
+  factory TaskListSettings.fromJson(Map<String, dynamic> parsedJson) {
+    TaskListSettings self = TaskListSettings();
+    self.allowsSimultaneousTasks =
+        parsedJson['_allowsSimultaneousTasks'] ?? false;
+    self.isContinous = parsedJson['isContinous'] ?? false;
+    return self;
+  }
+
+  Map<String, dynamic> toJson() => {
+        'allowsSimultaneousTasks': this.allowsSimultaneousTasks,
+        'isContinous': this.isContinous,
+      };
 }

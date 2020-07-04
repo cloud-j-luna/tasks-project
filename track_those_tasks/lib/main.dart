@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trackthosetasks/assets/colors.dart';
 import 'package:trackthosetasks/screens/wrapper.dart';
 import 'package:trackthosetasks/services/auth.dart';
 
@@ -22,7 +23,7 @@ class TrackThoseTasks extends StatelessWidget {
     return MaterialApp(
       title: 'Track Those Tasks',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primaryColor: CustomColors.primaryColor,
       ),
       home: Wrapper(),
       navigatorObservers: [routeObserver],

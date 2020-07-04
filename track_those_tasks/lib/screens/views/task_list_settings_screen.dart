@@ -57,6 +57,20 @@ class _TaskListSettingsScreen extends State<TaskListSettingsScreen> {
                     print("updated");
                     setState(() {
                       taskList?.settings?.allowsSimultaneousTasks = value;
+                      taskList?.settings?.isContinous = false;
+                    });
+                  }),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: CheckboxListTile(
+                  title: Text(TASK_LIST_SETTINGS_IS_CONTINOUS),
+                  value: taskList?.settings?.isContinous,
+                  onChanged: (bool value) {
+                    print("updated");
+                    setState(() {
+                      taskList?.settings?.isContinous = value;
+                      taskList?.settings?.allowsSimultaneousTasks = false;
                     });
                   }),
             ),

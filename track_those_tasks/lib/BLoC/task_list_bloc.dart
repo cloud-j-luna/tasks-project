@@ -15,8 +15,6 @@ class SelectedTaskListBloc implements Bloc {
 
   Stream<TaskList> get taskListStream => _taskListController.stream;
 
-  // Sink<TaskList> get updateTaskList => _taskListController.sink;
-
   void selectTaskList(TaskList taskList) {
     _taskList = taskList;
     _taskListController.add(_taskList);
@@ -38,6 +36,9 @@ class SelectedTaskListBloc implements Bloc {
 
   void addCurrentTask(Task task) {
     if (currentTasks.indexWhere((t) => t.uuid == task.uuid) >= 0) return;
+    if (!_taskList.settings.allowsSimultaneousTasks) {
+      currentTasks.clear();
+    }
     currentTasks.add(task);
   }
 
@@ -53,11 +54,35 @@ class SelectedTaskListBloc implements Bloc {
   }
 
   void resumeCurrentTasks() {
-    if(currentTasks.isEmpty) return;
+    if (currentTasks.isEmpty) return;
     currentTasks.forEach((task) {
       task.startTask();
     });
     _taskListController.add(_taskList);
+  }
+
+  void completeCurrentTask() {
+    if (currentTasks.isEmpty) return;
+
+    currentTasks.forEach((task) {
+      task.completeTask();
+    });
+
+    if (_taskList.settings.isContinous) {
+      var indexCurrentTask = _taskList.tasks.indexOf(currentTasks.first);
+      var indexNextTask = indexCurrentTask + 1;
+      while (indexNextTask < _taskList.tasks.length) {
+        final task = _taskList.tasks[indexNextTask];
+        if (task.status == TaskStatus.none ||
+            task.status == TaskStatus.inProgress) {
+          task.startTask();
+          addCurrentTask(task);
+          break;
+        }
+
+        indexNextTask++;
+      }
+    }
   }
 
   @override

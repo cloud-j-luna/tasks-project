@@ -6,13 +6,16 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:trackthosetasks/BLoC/dashboard_bloc.dart';
 import 'package:trackthosetasks/BLoC/task_list_bloc.dart';
+import 'package:trackthosetasks/assets/colors.dart';
 import 'package:trackthosetasks/assets/strings.dart';
+import 'package:trackthosetasks/assets/styles.dart';
 import 'package:trackthosetasks/models/task.dart';
 import 'package:trackthosetasks/models/task_list.dart';
 import 'package:trackthosetasks/screens/views/report_screen.dart';
 import 'package:trackthosetasks/screens/views/show_attachment_screen.dart';
 import 'package:trackthosetasks/screens/views/take_picture_screen.dart';
 import 'package:trackthosetasks/screens/views/task_list_settings_screen.dart';
+import 'package:trackthosetasks/sound_player.dart';
 import 'package:uuid/uuid.dart';
 import 'package:proximity_plugin/proximity_plugin.dart';
 
@@ -20,27 +23,33 @@ import 'package:trackthosetasks/extensions.dart';
 
 class TaskListScreen extends StatefulWidget {
   final selectedTaskList;
-  final DashboardBloc dashboardBloc;
+  DashboardBloc dashboardBloc;
 
   TaskListScreen(this.selectedTaskList, this.dashboardBloc);
 
   @override
-  State<StatefulWidget> createState() => _TaskListScreen(selectedTaskList);
+  State<StatefulWidget> createState() =>
+      _TaskListScreen(selectedTaskList, dashboardBloc);
 }
 
 class _TaskListScreen extends State<TaskListScreen> {
+  DashboardBloc _dashboardBloc;
   Timer _timer;
   SelectedTaskListBloc _selectedTaskListBloc;
 
   StreamSubscription proxSubscription;
   bool _proximityIn;
   bool _paused;
+  DateTime _startProx;
 
-  _TaskListScreen(TaskList selectedTaskList) {
+  _TaskListScreen(TaskList selectedTaskList, DashboardBloc dashboardBloc) {
     _selectedTaskListBloc = SelectedTaskListBloc();
     _selectedTaskListBloc.selectTaskList(selectedTaskList);
+
+    _dashboardBloc = dashboardBloc;
     _proximityIn = false;
     _paused = false;
+    bool _proximityFirst = true;
 
     () async {
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -48,30 +57,50 @@ class _TaskListScreen extends State<TaskListScreen> {
 
       if (androidInfo.isPhysicalDevice) {
         proxSubscription = proximityEvents.listen((event) {
-          if (_proximityIn) {
-          } else {
-            if (_paused)
-              _selectedTaskListBloc.resumeCurrentTasks();
-            else
-              _selectedTaskListBloc.pauseCurrentTasks();
-
-            _paused = !_paused;
+          // Workout for starting event...
+          if (_proximityFirst) {
+            _proximityFirst = false;
+            return;
           }
           _proximityIn = !_proximityIn;
+
+          if (_proximityIn) {
+            print('IN');
+            _startProx = DateTime.now();
+          } else {
+            print('OUT');
+            final _endProx = DateTime.now();
+            final duration = _endProx.difference(_startProx);
+            print("Duration ${duration.inSeconds}");
+            if (duration >= Duration(seconds: 2)) {
+              _selectedTaskListBloc.completeCurrentTask();
+            } else {
+              if (_paused)
+                _selectedTaskListBloc.resumeCurrentTasks();
+              else
+                _selectedTaskListBloc.pauseCurrentTasks();
+
+              _paused = !_paused;
+            }
+          }
         });
       }
     }();
   }
 
   _startTimeCounter() {
+    if (_timer != null && _timer.isActive) return;
     print("started");
-    setState(() {}); // force UI update
+    if (mounted) setState(() {});
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
-      (Timer timer) => setState(
-        () {},
-      ),
+      (_) {
+        if (mounted)
+          setState(
+            () {},
+          );
+      },
     );
   }
 
@@ -83,17 +112,17 @@ class _TaskListScreen extends State<TaskListScreen> {
 
   @override
   void dispose() {
+    proxSubscription?.cancel();
     _timer?.cancel();
-    proxSubscription.cancel();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _dashboardBloc = widget.dashboardBloc;
     TaskList _taskList = _selectedTaskListBloc.selectedTaskList;
 
-    _updateCurrentTaskList(TaskList updatedTaskList) {
+    _updateCurrentTaskListSettings(TaskList updatedTaskList) {
       _selectedTaskListBloc.updateTaskList(updatedTaskList);
     }
 
@@ -124,6 +153,7 @@ class _TaskListScreen extends State<TaskListScreen> {
           return Scaffold(
             appBar: AppBar(
               title: Text(_taskList.name),
+              backgroundColor: CustomColors.primaryDarkColor,
               actions: <Widget>[
                 IconButton(
                   onPressed: () => {
@@ -137,11 +167,13 @@ class _TaskListScreen extends State<TaskListScreen> {
                 IconButton(
                   onPressed: () => {
                     Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TaskListSettingsScreen(
-                                    _taskList, _dashboardBloc)))
-                        .then((value) => _updateCurrentTaskList(value))
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TaskListSettingsScreen(
+                                _taskList, _dashboardBloc))).then((value) {
+                      if (value != null) _updateCurrentTaskListSettings(value);
+                      _dashboardBloc.saveTaskLists();
+                    })
                   },
                   icon: Icon(Icons.settings),
                 ),
@@ -149,6 +181,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                     builder: (ctx) => IconButton(
                           onPressed: () {
                             _deleteCurrentTaskList(ctx);
+                            _dashboardBloc.saveTaskLists();
                             Navigator.pop(context);
                           },
                           icon: Icon(Icons.delete),
@@ -167,54 +200,53 @@ class _TaskListScreen extends State<TaskListScreen> {
 
                   log("Creating task with title: $title : $description");
                   Task task = Task(
-                      uuid: Uuid().toString(),
+                      uuid: Uuid().v4().toString(),
                       title: title,
                       description: description);
 
                   _taskList.addTask(task);
                   _selectedTaskListBloc.updateTaskList(_taskList);
+                  _dashboardBloc.saveTaskLists();
                 });
               },
               child: Icon(Icons.add),
-              backgroundColor: Colors.green,
+              backgroundColor: CustomColors.primaryDarkColor,
             ),
             body: _taskList.tasks == null
                 ? Text(TASK_LIST_EMPTY)
                 : Container(
+                  color: CustomColors.lighGrey,
                     padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
                     width: double.maxFinite,
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(_taskList.name),
-                        ),
-                        _buildListOfTasks(_taskList, _selectedTaskListBloc),
-                      ],
-                    ),
+                    child: _buildListOfTasks(_taskList, _selectedTaskListBloc),
                   ),
           );
         });
   }
 
   Widget _buildListOfTasks(TaskList taskList, SelectedTaskListBloc bloc) {
-    return Expanded(
-        child: ListView.builder(
-            itemCount: taskList.tasks?.length,
-            itemBuilder: (context, index) {
-              Task task = taskList.tasks[index];
-              return _buildTaskCard(task, bloc);
-            }));
+    return ListView.builder(
+        itemCount: taskList.tasks?.length,
+        itemBuilder: (context, index) {
+          Task task = taskList.tasks[index];
+          return _buildTaskCard(task, bloc);
+        });
   }
 
   Widget _buildTaskCard(Task task, SelectedTaskListBloc bloc) {
+    final _styles = ScreenStyles();
+
     return Card(
         child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ListTile(
-          trailing: Icon(Icons.more_vert),
-          title: Text(task.title),
+          title: Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+              child: Text(
+                task.title,
+                style: _styles.taskCardTitle,
+              )),
           subtitle: Text(task.description),
           isThreeLine: true,
         ),
@@ -249,11 +281,11 @@ class _TaskListScreen extends State<TaskListScreen> {
             top: -40.0,
             child: InkResponse(
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
               child: CircleAvatar(
                 child: Icon(Icons.close),
-                backgroundColor: Colors.red,
+                backgroundColor: CustomColors.primaryDarkColor,
               ),
             ),
           ),
@@ -281,6 +313,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: RaisedButton(
                     child: Text(TASK_LIST_ADD_TASK_SUBMIT),
+                    color: CustomColors.primaryLightColor,
                     onPressed: () {
                       Navigator.pop(dialogContext,
                           [_titleController.text, _descriptionController.text]);
@@ -303,41 +336,53 @@ class _TaskListScreen extends State<TaskListScreen> {
       task.startTask();
       _selectedTaskListBloc.addCurrentTask(task);
       _startTimeCounter();
+      _dashboardBloc.saveTaskLists();
+      SoundPlayer.playClickSound();
     }
 
     if (task.status == TaskStatus.inProgress)
       actions.add(FlatButton(
         child: Text(TASK_ACTION_RESUME),
+        textColor: CustomColors.primaryColor,
         onPressed: () => _startTask(),
       ));
 
     if (task.status == TaskStatus.none)
       actions.add(FlatButton(
         child: Text(TASK_ACTION_START),
+        textColor: CustomColors.primaryColor,
         onPressed: () => _startTask(),
       ));
 
     if (task.status == TaskStatus.doing) {
       actions.add(FlatButton(
         child: Text(TASK_ACTION_PAUSE),
+        textColor: CustomColors.primaryColor,
         onPressed: () {
           task.pauseTask();
           _stopTimeCounter();
+          _dashboardBloc.saveTaskLists();
+          SoundPlayer.playDongSound();
         },
       ));
 
       actions.add(FlatButton(
         child: Text(TASK_ACTION_DONE),
+        textColor: CustomColors.primaryColor,
         onPressed: () {
-          task.finishTask();
+          task.completeTask();
+          _selectedTaskListBloc.completeCurrentTask();
           _selectedTaskListBloc.removeCurrentTask(task);
           _stopTimeCounter();
+          _dashboardBloc.saveTaskLists();
+          SoundPlayer.playConfirmSound();
         },
       ));
     }
 
     actions.add(FlatButton(
       child: Text(TASK_ACTION_ADD_ATTACHMENT),
+      textColor: CustomColors.primaryColor,
       onPressed: () async {
         final cameras = await availableCameras();
 
@@ -346,16 +391,21 @@ class _TaskListScreen extends State<TaskListScreen> {
         Navigator.push(context,
             new MaterialPageRoute(builder: (BuildContext context) {
           return TakePictureScreen(camera: firstCamera);
-        })).then((value) => task.addAttachmentPath(value));
+        })).then((value) {
+          task.addAttachmentPath(value);
+          setState(() {});
+          _dashboardBloc.saveTaskLists();
+        });
       },
     ));
     actions.add(FlatButton(
       child: Text(TASK_ACTION_SHOW_ATTACHMENT),
+      textColor: CustomColors.primaryColor,
       onPressed: () {
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {
           return ShowAttachmentScreenState(task: task);
-        }));
+        })).then((value) => _dashboardBloc.saveTaskLists());
       },
     ));
 

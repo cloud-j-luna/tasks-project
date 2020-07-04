@@ -15,11 +15,35 @@ class Task {
   }
 
   factory Task.fromJson(Map<String, dynamic> parsedJson) {
-    return Task(
-        uuid: parsedJson['uuid'] as String,
-        title: parsedJson['title'] as String,
-        description: parsedJson['description'] as String);
+    Task task = Task(
+        uuid: parsedJson['uuid'] as String ?? "",
+        title: parsedJson['title'] as String ?? "",
+        description: parsedJson['description'] as String ?? "");
+
+    task.status = TaskStatus.values
+        .firstWhere((e) => e.toString() == parsedJson['status']);
+    task.intervals = (parsedJson['intervals'] as List)
+            ?.map((json) => Duration(seconds: json))
+            ?.toList() ??
+        [];
+    task.attachmentPaths =
+        (parsedJson['attachmentPaths'] as List).map((e) => "").toList();
+    task.startTimestamp = DateTime.tryParse(parsedJson['startTimestamp']);
+    task.completeDate = DateTime.tryParse(parsedJson['completeDate']);
+
+    return task;
   }
+
+  Map<String, dynamic> toJson() => {
+        'uuid': this.uuid,
+        'title': this.title,
+        'description': this.description,
+        'status': this.status.toString(),
+        'intervals': this.intervals.map((e) => e.inSeconds).toList(),
+        'attachmentPaths': this.attachmentPaths,
+        'startTimestamp': this.startTimestamp?.toIso8601String() ?? "",
+        'completeDate': this.completeDate?.toIso8601String() ?? ""
+      };
 
   Duration get currentSession {
     if (startTimestamp == null) return null;
@@ -44,7 +68,7 @@ class Task {
     this.attachmentPaths.add(path);
   }
 
-  void removeAttachmentPath(int index){
+  void removeAttachmentPath(int index) {
     this.attachmentPaths.removeAt(index);
   }
 
@@ -58,7 +82,7 @@ class Task {
     _endInterval();
   }
 
-  void finishTask() {
+  void completeTask() {
     this.status = TaskStatus.done;
     this.completeDate = DateTime.now();
     _endInterval();

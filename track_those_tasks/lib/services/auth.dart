@@ -12,7 +12,19 @@ class AuthService {
   }
 
   Stream<User> get user {
+    () async {
+      await _tryRefreshToken();
+    }();
+
     return _auth.onAuthStateChanged.map(_convertUserFromFirebaseUser);
+  }
+
+  Future<void> _tryRefreshToken() async {
+    FirebaseUser user = await _auth.currentUser();
+
+    if (user != null) {
+      await user.getIdToken(refresh: true);
+    }
   }
 
   // sign in anon
