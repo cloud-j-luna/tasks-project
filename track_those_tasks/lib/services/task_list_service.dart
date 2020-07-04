@@ -13,7 +13,9 @@ class TaskListService {
   Future<List<TaskList>> get taskLists async {
     var response = await http.get(url);
 
-    // if(response != 200) throw Exception("Failed to get data");
+    if (response.statusCode != 200)
+      throw Exception(
+          "Failed to get data. Status code: ${response.statusCode}");
 
     return _decodeData(response.body);
   }
@@ -25,23 +27,10 @@ class TaskListService {
     var response = await http.post(url,
         headers: {'content-type': 'application/json'}, body: json);
     print(response.body);
-    // if (response.statusCode >= 300) throw Exception("Failed to save");
+    
+    if (response.statusCode != 204) throw Exception("Failed to save. Status code ${response.statusCode}");
   }
 
-  Future<List<TaskList>> get taskLists_old async {
-    final file = await rootBundle.loadString("assets/mock_data.json");
-
-    return _decodeData(file);
-  }
-
-  void saveTaskLists_old(List<TaskList> lists) async {
-    final file = await rootBundle.loadString("assets/mock_data.json");
-
-    var json = jsonEncode(lists);
-    File(file)
-      ..createSync(recursive: true)
-      ..writeAsString(json);
-  }
 
   List<TaskList> _decodeData(String file) {
     List<TaskList> taskLists = new List<TaskList>();
