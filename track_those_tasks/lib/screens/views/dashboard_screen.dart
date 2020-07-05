@@ -139,42 +139,10 @@ class _DashboardScreen extends State<DashboardScreen>
     );
   }
 
-  Widget _taskListItem(BuildContext context, TaskList taskList) {
-    return ListTile(
-      onTap: () {
-        log("Opening list:  ${taskList.name}");
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => TaskListScreen(
-                      taskList,
-                      _dashBoardBloc,
-                    ))).then((value) => setState(
-              () {},
-            ));
-      },
-      leading: IconButton(
-          icon: taskList.isFavourite
-              ? Icon(Icons.favorite)
-              : Icon(Icons.favorite_border),
-          onPressed: () {
-            print('favourite toggle');
-            taskList.toggleFavourite();
-            _dashBoardBloc.saveTaskLists();
-          }),
-      title: Text(
-        taskList.name,
-        style: _styles.dashboardTaskListItem,
-      ),
-      trailing: Icon(Icons.keyboard_arrow_right),
-    );
-  }
-
   Widget _taskListItem_card(BuildContext context, TaskList taskList) {
     return Padding(
         padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
         child: GestureDetector(
-          
             onTap: () {
               log("Opening list:  ${taskList.name}");
               Navigator.push(
