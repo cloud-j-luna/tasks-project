@@ -1,1 +1,2 @@
-<app-dashboard></app-dashboard>
+<dashboard *ngIf="authService.isLoggedIn"></dashboard>
+<login *ngIf="!authService.isLoggedIn"></login>

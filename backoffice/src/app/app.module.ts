@@ -6,6 +6,10 @@ import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { LoginComponent } from './login/login.component';
+import { AuthService } from './auth/auth.service';
+import { SingUpComponent } from './sing-up/sing-up.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 const environment = {
   production: false,
@@ -19,14 +23,24 @@ const environment = {
     auth_uri: "https://accounts.google.com/o/oauth2/auth",
     token_uri: "https://oauth2.googleapis.com/token",
     auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-qtzrt%40tasks-project-ca5f2.iam.gserviceaccount.com"
+    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-qtzrt%40tasks-project-ca5f2.iam.gserviceaccount.com",
+    apiKey: "AIzaSyBxBao-pUt9Yc3SeXwG_ycCn6xmNEnMkyE",
+    authDomain: "tasks-project-ca5f2.firebaseapp.com",
+    databaseURL: "https://tasks-project-ca5f2.firebaseio.com",
+    storageBucket: "tasks-project-ca5f2.appspot.com",
+    messagingSenderId: "969210256952",
+    appId: "1:969210256952:web:d5e7bdeefee881ba6b50cd",
+    measurementId: "G-QR580XDRT7"
   }  
 };
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    DashboardComponent,
+    LoginComponent,
+    SingUpComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +48,7 @@ const environment = {
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
