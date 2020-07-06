@@ -12,8 +12,12 @@ export class DashboardComponent implements OnInit {
   constructor(private reportingService: ReportingService, public authService: AuthService) { }
 
   ngOnInit(): void {
-    this.reportingService.fetchTasklist(data => {
-      console.log(data);
+    this.reportingService.fetchTasklists(data => {
+      //console.log(data);
+    });
+
+    this.reportingService.loadTasklists(data => {
+      console.log(this.reportingService.getCompletedTasklists());
     });
   }
 
