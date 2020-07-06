@@ -1,0 +1,20 @@
+.card {
+    width: 200px;
+    height: 100px;
+    border-radius: 5x;
+    border: 1px solid #ccc;
+    margin-top:10px;
+}
+
+.card-title{
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.card-title, .card-text {
+    text-align: center;
+}
+
+.page-title {
+    text-align: center;
+}

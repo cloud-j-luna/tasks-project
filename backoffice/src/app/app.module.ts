@@ -10,6 +10,9 @@ import { LoginComponent } from './login/login.component';
 import { AuthService } from './auth/auth.service';
 import { SingUpComponent } from './sing-up/sing-up.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatIconModule } from '@angular/material/icon';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 const environment = {
   production: false,
@@ -46,8 +49,12 @@ const environment = {
     BrowserModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    BrowserAnimationsModule,
+    MatIconModule,    
+    NgxChartsModule,
   ],
+  
   providers: [AuthService],
   bootstrap: [AppComponent]
 })

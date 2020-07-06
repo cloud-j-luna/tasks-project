@@ -7,11 +7,13 @@ class Task {
   List<String> attachmentPaths;
   DateTime startTimestamp;
   DateTime completeDate;
+  DateTime createdTimestamp;
 
   Task({this.uuid, this.title, this.description}) {
     this.status = TaskStatus.none;
     this.intervals = List<Duration>();
     this.attachmentPaths = List<String>();
+    this.createdTimestamp = DateTime.now();
   }
 
   factory Task.fromJson(Map<String, dynamic> parsedJson) {
@@ -30,6 +32,7 @@ class Task {
         (parsedJson['attachmentPaths'] as List).map((e) => "").toList();
     task.startTimestamp = DateTime.tryParse(parsedJson['startTimestamp']);
     task.completeDate = DateTime.tryParse(parsedJson['completeDate']);
+    task.createdTimestamp = DateTime.tryParse(parsedJson['createdTimestamp']);
 
     return task;
   }
@@ -42,7 +45,8 @@ class Task {
         'intervals': this.intervals.map((e) => e.inSeconds).toList(),
         'attachmentPaths': this.attachmentPaths,
         'startTimestamp': this.startTimestamp?.toIso8601String() ?? "",
-        'completeDate': this.completeDate?.toIso8601String() ?? ""
+        'completeDate': this.completeDate?.toIso8601String() ?? "",
+        'createdTimestamp': this.createdTimestamp?.toIso8601String() ?? ""
       };
 
   Duration get currentSession {
