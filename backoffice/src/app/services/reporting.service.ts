@@ -1,6 +1,9 @@
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Injectable } from '@angular/core';
 
+const DAYS_BEFORE = 7;
+const PAST_OFFSET = DAYS_BEFORE * 24 * 60 * 60 * 1000
+
 @Injectable({providedIn: 'root'})
 export class ReportingService {
     tasklists: any[];
@@ -54,13 +57,31 @@ export class ReportingService {
 
             for(let task of tasklist['_tasks']) {
                 let datePlus7 = new Date();
-                datePlus7.setDate((task['createdTimestamp']).getDate() + 7)
-                if(datePlus7 > new Date(Date.now())) {
+                datePlus7.setTime((new Date(task['createdTimestamp'])).getTime() + PAST_OFFSET);
+                if(datePlus7.getTime() > Date.now()) {
                     allTasks.push(task);
                 }
             }
         }
 
         return allTasks;
+    }
+
+    getStructuredTasksFrom7Days() {
+        const tasks = this.getTasksFrom7Days();
+        const result = {};
+
+        for(let task of tasks) {
+            let key = new Date(task.createdTimestamp).toDateString();
+            if(!result[key]) result[key] = [];
+
+            result[key].push(task);
+        }
+
+        return result;
+    }
+
+    getEmptyTaskLists() {
+        return this.tasklists.filter(tl => !tl.tasks || tl.tasks.length === 0).slice();
     }
 }

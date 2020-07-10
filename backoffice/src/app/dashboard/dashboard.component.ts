@@ -12,12 +12,12 @@ export class DashboardComponent implements OnInit {
   constructor(private reportingService: ReportingService, public authService: AuthService) {
     this.multi = [];
 
-    this.counters.set("TOTAL 1", 20);
-    this.counters.set("TOTAL 2", 20);
-    this.counters.set("TOTAL 3", 20);
-    this.counters.set("TOTAL 4", 20);
-    this.counters.set("TOTAL 5", 20);
-    this.counters.set("TOTAL 6", 20);
+    this.counters.set("Total task lists", 0);
+    this.counters.set("Tasks in last 7 days", 0);
+    this.counters.set("Completed task lists", 0);
+    this.counters.set("Empty task lists", 0);
+    this.counters.set("TOTAL 5", 0);
+    this.counters.set("TOTAL 6", 0);
 
   }
 
@@ -36,12 +36,30 @@ export class DashboardComponent implements OnInit {
   counters: Map<string, number> = new Map<string, number>();
 
   ngOnInit(): void {
-    this.reportingService.fetchTasklists(data => {
-      //console.log(data);
-    });
-
     this.reportingService.loadTasklists(data => {
-      console.log(this.reportingService.getCompletedTasklists());
+      this.counters.set("Total task lists", this.reportingService.getTotalTasklists());
+      this.counters.set("Tasks in last 7 days", this.reportingService.getTasksFrom7Days().length);
+      this.counters.set("Completed task lists", this.reportingService.getCompletedTasklists().length);
+      this.counters.set("Empty task lists", this.reportingService.getCompletedTasklists().length);
+
+      let tasks = this.reportingService.getStructuredTasksFrom7Days();
+      for(let day in tasks) {
+        this.multi.push({
+          name: day,
+          series: [
+            {
+              name: "created",
+              value: tasks[day].length
+            },
+            {
+              name: "completed",
+              value: tasks[day].filter(elem => elem['status'] === 'TaskStatus.done').length
+            }
+          ]
+        });
+      }
+
+      this.multi = this.multi.slice();
     });
   }
 
