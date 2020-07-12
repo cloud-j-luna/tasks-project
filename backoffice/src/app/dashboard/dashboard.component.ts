@@ -16,8 +16,7 @@ export class DashboardComponent implements OnInit {
     this.counters.set("Tasks in last 7 days", 0);
     this.counters.set("Completed task lists", 0);
     this.counters.set("Empty task lists", 0);
-    this.counters.set("TOTAL 5", 0);
-    this.counters.set("TOTAL 6", 0);
+    this.counters.set("Time spent last 7 days (sec)", 0);
 
   }
 
@@ -40,7 +39,8 @@ export class DashboardComponent implements OnInit {
       this.counters.set("Total task lists", this.reportingService.getTotalTasklists());
       this.counters.set("Tasks in last 7 days", this.reportingService.getTasksFrom7Days().length);
       this.counters.set("Completed task lists", this.reportingService.getCompletedTasklists().length);
-      this.counters.set("Empty task lists", this.reportingService.getCompletedTasklists().length);
+      this.counters.set("Empty task lists", this.reportingService.getEmptyTaskLists().length);
+      this.counters.set("Time spent last 7 days (sec)", this.reportingService.getTimeSpentInLast7Days());
 
       let tasks = this.reportingService.getStructuredTasksFrom7Days();
       for(let day in tasks) {

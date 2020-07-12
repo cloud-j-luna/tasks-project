@@ -82,6 +82,13 @@ export class ReportingService {
     }
 
     getEmptyTaskLists() {
-        return this.tasklists.filter(tl => !tl.tasks || tl.tasks.length === 0).slice();
+        return this.tasklists.filter(tl => !tl['_tasks'] || tl['_tasks'].length === 0).slice();
+    }
+
+    getTimeSpentInLast7Days() {
+        let allTasks = this.getTasksFrom7Days();
+        return allTasks.reduce((prev, currentValue, index) => {
+            return prev + currentValue.intervals.reduce( (p, c, i) => p + c, 0);
+        }, 0);
     }
 }
