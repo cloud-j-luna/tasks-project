@@ -3,4 +3,5 @@ WORKDIR /app
 COPY . .
 EXPOSE 4200
 RUN npm install -g @angular/cli
-RUN npm install && ng serve
+RUN npm install
+ENTRYPOINT ["ng", "serve"]
