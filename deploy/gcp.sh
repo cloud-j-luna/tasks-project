@@ -28,4 +28,8 @@ gcloud auth configure-docker
 docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION ./backend
 docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_VERSION
 
+docker build -f ./deploy/tasks.Dockerfile -t gcr.io/$PROJECT_ID/backoffice:$IMAGE_VERSION ./backoffice
+docker push gcr.io/$PROJECT_ID/backoffice:$IMAGE_VERSION
+
 kubectl delete -f deploy/tasks.yaml && kubectl apply -f deploy/tasks.yaml
+kubectl delete -f deploy/angular.yaml && kubectl apply -f deploy/angular.yaml
