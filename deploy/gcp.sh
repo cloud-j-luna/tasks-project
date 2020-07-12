@@ -31,4 +31,4 @@ docker build -f ./deploy/angular.Dockerfile -t gcr.io/$PROJECT_ID/backoffice:$IM
 docker push gcr.io/$PROJECT_ID/backoffice:$IMAGE_VERSION
 
 kubectl delete -f deploy/tasks.yaml && kubectl apply -f deploy/tasks.yaml
-kubectl delete -f deploy/angular.yaml && kubectl apply -f deploy/angular.yaml
+kubectl apply -f deploy/angular.yaml

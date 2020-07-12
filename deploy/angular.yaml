@@ -33,3 +33,17 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backoffice-service
+  namespace: backoffice-dev
+spec:
+  type: NodePort
+  selector:
+    name: backoffice
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4200
