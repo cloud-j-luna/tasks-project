@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: backoffice
+  name: backoffice-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: backoffice
+  template:
+    metadata:
+      labels:
+        name: backoffice
+    spec:
+      containers:
+      - name: backoffice-app
+        image: gcr.io/track-those-tasks/backoffice:v1
+        imagePullPolicy: Always
+        env:
+        - name: SERVER_ID  #export the pod ID as SERVER_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: environment
+          value: dev
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
