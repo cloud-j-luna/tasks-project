@@ -1,0 +1,11 @@
+.displayTable {
+    padding: 24px; 
+}
+
+input {
+    margin-bottom: 6px;
+}
+
+button {
+    border: 1px solid lightgray;
+}

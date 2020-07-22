@@ -19,7 +19,7 @@ router.post('/', function (req, res, next) {
         console.log(all);
 
         for(let tasklist of req.body) {
-            if(!taskList.id) {
+            if(!tasklist.id || taskList.id == "" ) {
                 TaskListRepository.Create(new TaskList(
                     tasklist.uuid,
                     tasklist.name,
@@ -49,7 +49,7 @@ router.post('/', function (req, res, next) {
             if(!foundInBody) TaskListRepository.Delete(t.id);
         }
         
-        res.statusCode = 201;
+        res.statusCode = 204;
         res.json(req.body);
     });
 });
